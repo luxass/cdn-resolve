@@ -50,7 +50,8 @@
     "build": "tsup",
     "dev": "vitest dev",
     "lint": "eslint .",
-    "test": "vitest run"
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
     "@luxass/eslint-config": "^3.1.0",
