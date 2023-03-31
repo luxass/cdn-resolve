@@ -3,6 +3,7 @@ export interface ParsedPackage {
   version: string;
   path?: string;
   scope?: string;
+  full: string;
 }
 
 export function parsePackage(pkg: string): ParsedPackage {
@@ -15,10 +16,20 @@ export function parsePackage(pkg: string): ParsedPackage {
     throw new Error(`Invalid package name: ${pkg}`);
   }
 
+  const name = matched.groups.name;
+  const version = matched.groups?.version || "latest";
+  const path = matched.groups?.path;
+  const scope = matched.groups?.scope;
+
+  const full = scope ?
+    `@${scope}/${name}@${version}${path || ""}` :
+    `${name}@${version}${path || ""}`;
+
   return {
-    name: matched.groups.name,
-    version: matched.groups?.version || "latest",
-    path: matched.groups?.path,
-    scope: matched.groups?.scope
+    name,
+    version,
+    path,
+    scope,
+    full
   };
 }

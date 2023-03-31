@@ -1,9 +1,12 @@
-export interface JSDelivrOptions {
-}
+import { parsePackage } from "./utils";
 
-export async function resolveJSDelivr(module: string, options?: JSDelivrOptions) {
+export function resolveJSDelivr(module: string) {
   try {
-    
+    const pkg = parsePackage(module);
+
+    const url = new URL(pkg.full, "https://cdn.jsdelivr.net/npm");
+
+    return url;
   } catch (e) {
     console.error(e);
     return undefined;

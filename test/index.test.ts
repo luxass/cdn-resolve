@@ -9,7 +9,8 @@ describe("packages with scopes", () => {
     expect(parsed).toEqual({
       scope: "babel",
       name: "core",
-      version: "latest"
+      version: "latest",
+      full: "@babel/core@latest"
     });
   });
 
@@ -20,7 +21,8 @@ describe("packages with scopes", () => {
       scope: "babel",
       name: "core",
       version: "7.21.3",
-      path: "/lib/parse.js"
+      path: "/lib/parse.js",
+      full: "@babel/core@7.21.3/lib/parse.js"
     });
   });
 
@@ -30,7 +32,8 @@ describe("packages with scopes", () => {
     expect(parsed).toEqual({
       scope: "babel",
       name: "core",
-      version: "7.21.3"
+      version: "7.21.3",
+      full: "@babel/core@7.21.3"
     });
   });
 
@@ -41,7 +44,8 @@ describe("packages with scopes", () => {
       scope: "babel",
       name: "core",
       version: "latest",
-      path: "/lib/parse.js"
+      path: "/lib/parse.js",
+      full: "@babel/core@latest/lib/parse.js"
     });
   });
 });
@@ -52,7 +56,8 @@ describe("packages without scopes", () => {
 
     expect(parsed).toEqual({
       name: "react",
-      version: "latest"
+      version: "latest",
+      full: "react@latest"
     });
   });
 
@@ -62,7 +67,8 @@ describe("packages without scopes", () => {
     expect(parsed).toEqual({
       name: "react",
       version: "18.2.0",
-      path: "/package.json"
+      path: "/package.json",
+      full: "react@18.2.0/package.json"
     });
   });
 
@@ -71,7 +77,8 @@ describe("packages without scopes", () => {
 
     expect(parsed).toEqual({
       name: "react",
-      version: "18.2.0"
+      version: "18.2.0",
+      full: "react@18.2.0"
     });
   });
 
@@ -81,7 +88,8 @@ describe("packages without scopes", () => {
     expect(parsed).toEqual({
       name: "react",
       version: "latest",
-      path: "/package.json"
+      path: "/package.json",
+      full: "react@latest/package.json"
     });
   });
 });
