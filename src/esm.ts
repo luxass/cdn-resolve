@@ -122,6 +122,7 @@ export function resolveESM(module: string, options?: ESMOptions) {
     return undefined;
   }
 }
+
 export async function resolveESMTypes(url: URL | string) {
   if (typeof url === "string") {
     url = new URL(url);
