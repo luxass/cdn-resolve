@@ -124,8 +124,8 @@ export function resolveESM(module: string, options?: ESMOptions) {
 }
 
 export async function resolveESMTypes(url: URL | string) {
-  if (typeof url === "string") {
-    url = new URL(url);
+  if (url instanceof URL) {
+    url = url.toString()
   }
 
   const headers = await fetch(url).then((res) => res.headers);
