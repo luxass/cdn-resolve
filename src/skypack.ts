@@ -5,7 +5,7 @@ export interface SkypackOptions {
   dts?: boolean;
 }
 
-export async function resolveSkypack(module: string, options?: SkypackOptions) {
+export function resolveSkypack(module: string, options?: SkypackOptions) {
   try {
     const pkg = parsePackage(module);
 

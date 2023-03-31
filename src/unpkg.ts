@@ -11,7 +11,7 @@ export function resolveUnpkg(module: string, options?: UnpkgOptions) {
 
     const url = new URL(
       pkg.full,
-      "https://esm.sh"
+      "https://unpkg.com"
     );
 
     if (options?.meta) {
