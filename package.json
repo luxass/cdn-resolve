@@ -34,6 +34,21 @@
       "require": "./dist/skypack.cjs",
       "import": "./dist/skypack.js"
     },
+    "./esm": {
+      "types": "./dist/esm.d.ts",
+      "require": "./dist/esm.cjs",
+      "import": "./dist/esm.js"
+    },
+    "./jsdelivr": {
+      "types": "./dist/jsdelivr.d.ts",
+      "require": "./dist/jsdelivr.cjs",
+      "import": "./dist/jsdelivr.js"
+    },
+    "./unpkg": {
+      "types": "./dist/unpkg.d.ts",
+      "require": "./dist/unpkg.cjs",
+      "import": "./dist/unpkg.js"
+    },
     "./package.json": "./package.json"
   },
   "main": "./dist/index.cjs",
