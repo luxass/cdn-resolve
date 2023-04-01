@@ -21,7 +21,7 @@ export type { ESMOptions, SkypackHeaders, SkypackOptions };
 
 export const CDN_URLS = {
   skypack: "https://cdn.skypack.dev",
-  esm: "https://cdn.esm.sh",
+  esm: "https://esm.sh",
   unpkg: "https://unpkg.com",
   jsdelivr: "https://cdn.jsdelivr.net/npm"
 };
