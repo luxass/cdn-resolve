@@ -1,7 +1,7 @@
 {
   "name": "cdn-resolve",
   "type": "module",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Resolves import paths to their CDN equivalents",
   "author": {
     "name": "Lucas Nørgård",
@@ -25,29 +25,29 @@
   ],
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
       "require": "./dist/index.cjs",
-      "import": "./dist/index.js"
+      "types": "./dist/index.d.ts"
     },
     "./skypack": {
-      "types": "./dist/skypack.d.ts",
+      "import": "./dist/skypack.js",
       "require": "./dist/skypack.cjs",
-      "import": "./dist/skypack.js"
+      "types": "./dist/skypack.d.ts"
     },
     "./esm": {
-      "types": "./dist/esm.d.ts",
+      "import": "./dist/esm.js",
       "require": "./dist/esm.cjs",
-      "import": "./dist/esm.js"
+      "types": "./dist/esm.d.ts"
     },
     "./jsdelivr": {
-      "types": "./dist/jsdelivr.d.ts",
+      "import": "./dist/jsdelivr.js",
       "require": "./dist/jsdelivr.cjs",
-      "import": "./dist/jsdelivr.js"
+      "types": "./dist/jsdelivr.d.ts"
     },
     "./unpkg": {
-      "types": "./dist/unpkg.d.ts",
+      "import": "./dist/unpkg.js",
       "require": "./dist/unpkg.cjs",
-      "import": "./dist/unpkg.js"
+      "types": "./dist/unpkg.d.ts"
     },
     "./package.json": "./package.json"
   },
@@ -72,7 +72,7 @@
     "ofetch": "^1.0.1"
   },
   "devDependencies": {
-    "@luxass/eslint-config": "^3.1.0",
+    "@luxass/eslint-config": "^3.1.1",
     "@luxass/prettier-config": "^1.2.0",
     "@types/node": "^18.15.10",
     "eslint": "^8.36.0",
