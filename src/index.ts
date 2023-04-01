@@ -19,7 +19,9 @@ export {
 };
 export type { ESMOptions, SkypackHeaders, SkypackOptions };
 
-export function resolveCDN(cdn: "skypack" | "esm" | "unpkg" | "jsdelivr") {
+export type SupportedCDNS = "skypack" | "esm" | "unpkg" | "jsdelivr";
+
+export function resolveCDN(cdn: SupportedCDNS) {
   switch (cdn) {
     case "skypack":
       return resolveSkypack;

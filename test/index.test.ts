@@ -1,6 +1,13 @@
 import { describe, expect, test } from "vitest";
 
-import { parsePackage } from "../src";
+import {
+  parsePackage,
+  resolveCDN,
+  resolveESM,
+  resolveJSDelivr,
+  resolveSkypack,
+  resolveUnpkg
+} from "../src";
 
 describe("packages with scopes", () => {
   test("without version and path", () => {
@@ -98,4 +105,11 @@ test("throw error when package name is invalid", () => {
   expect(() => parsePackage("@babel")).toThrowError(
     "Invalid package name: @babel"
   );
+});
+
+test("resolve cdn from string", () => {
+  expect(resolveCDN("skypack")).toBe(resolveSkypack);
+  expect(resolveCDN("esm")).toBe(resolveESM);
+  expect(resolveCDN("unpkg")).toBe(resolveUnpkg);
+  expect(resolveCDN("jsdelivr")).toBe(resolveJSDelivr);
 });
