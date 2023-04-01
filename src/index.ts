@@ -19,15 +19,18 @@ export {
 };
 export type { ESMOptions, SkypackHeaders, SkypackOptions };
 
-
 export const CDN_URLS = {
   skypack: "https://cdn.skypack.dev",
   esm: "https://cdn.esm.sh",
   unpkg: "https://unpkg.com",
   jsdelivr: "https://cdn.jsdelivr.net/npm"
-}
+};
 
 export type SupportedCDNS = "skypack" | "esm" | "unpkg" | "jsdelivr";
+
+export function normalizeCdnUrl(cdn: SupportedCDNS, module: string): string {
+  return `${CDN_URLS[cdn]}/${module.replace(/^\//, "")}`;
+}
 
 export type ResolverFn = (module: string, options?: any) => URL | undefined;
 
