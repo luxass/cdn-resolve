@@ -5,7 +5,7 @@ export interface SkypackOptions {
   dts?: boolean;
 }
 
-export function resolveSkypack(module: string, options?: SkypackOptions) {
+export function resolveSkypack(module: string, options?: SkypackOptions): URL | undefined {
   try {
     const pkg = parsePackage(module);
 

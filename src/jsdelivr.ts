@@ -1,6 +1,6 @@
 import { parsePackage } from "./utils";
 
-export function resolveJSDelivr(module: string) {
+export function resolveJSDelivr(module: string): URL | undefined {
   try {
     const pkg = parsePackage(module);
 

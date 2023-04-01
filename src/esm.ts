@@ -46,7 +46,7 @@ export interface ESMOptions {
   noDts?: boolean;
 }
 
-export function resolveESM(module: string, options?: ESMOptions) {
+export function resolveESM(module: string, options?: ESMOptions): URL | undefined {
   try {
     const pkg = parsePackage(module);
 
@@ -123,7 +123,7 @@ export function resolveESM(module: string, options?: ESMOptions) {
   }
 }
 
-export async function resolveESMTypes(url: URL | string) {
+export async function resolveESMTypes(url: URL | string): Promise<string | null> {
   if (url instanceof URL) {
     url = url.toString()
   }

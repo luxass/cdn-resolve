@@ -5,7 +5,7 @@ export interface UnpkgOptions {
   meta?: boolean;
 }
 
-export function resolveUnpkg(module: string, options?: UnpkgOptions) {
+export function resolveUnpkg(module: string, options?: UnpkgOptions): URL | undefined {
   try {
     const pkg = parsePackage(module);
 

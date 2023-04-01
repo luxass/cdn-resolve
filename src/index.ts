@@ -19,9 +19,20 @@ export {
 };
 export type { ESMOptions, SkypackHeaders, SkypackOptions };
 
+
+export const CDN_URLS = {
+  skypack: "https://cdn.skypack.dev",
+  esm: "https://cdn.esm.sh",
+  unpkg: "https://unpkg.com",
+  jsdelivr: "https://cdn.jsdelivr.net/npm"
+}
+
 export type SupportedCDNS = "skypack" | "esm" | "unpkg" | "jsdelivr";
 
-export function resolveCDN(cdn: SupportedCDNS) {
+export type ResolverFn = (module: string, options?: any) => URL | undefined;
+
+// TODO: Type this better
+export function resolveCDN(cdn: SupportedCDNS): ResolverFn {
   switch (cdn) {
     case "skypack":
       return resolveSkypack;
