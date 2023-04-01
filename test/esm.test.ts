@@ -16,8 +16,8 @@ test("resolve react@17", () => {
   expect(resolved.pathname).toBe("/react@17");
 });
 
-test("resolve react with preact alias", () => {
-  const resolved = resolveESM("react", {
+test("resolve swr with preact alias", () => {
+  const resolved = resolveESM("swr", {
     alias: {
       react: "preact/compat"
     }
@@ -27,8 +27,8 @@ test("resolve react with preact alias", () => {
   expect(resolved?.searchParams.get("alias")).toBe("react:preact/compat");
 });
 
-test("resolve react with preact alias and deps", () => {
-  const resolved = resolveESM("react", {
+test("resolve swr with preact alias and deps", () => {
+  const resolved = resolveESM("swr", {
     alias: {
       react: "preact/compat"
     },

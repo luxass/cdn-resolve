@@ -1,8 +1,6 @@
+import { ofetch } from "ofetch";
 import { parsePackage } from "./utils";
 
-/**
- * https://esm.sh/#docs
- */
 export interface ESMOptions {
   deps?: string[];
 
@@ -12,12 +10,30 @@ export interface ESMOptions {
    */
   external?: string[] | boolean;
 
+  /**
+   * Pin a specific version to a module
+   */
   pin?: string;
+
   esbuild?: {
+    /**
+     * The target environment for the generated code
+     */
     target?: "es2015" | "es2022" | "esnext" | "deno" | "denonext";
+
+    /**
+     * Keep names when minifying
+     * https://esbuild.github.io/api/#keep-names
+     */
     keepNames?: boolean;
+
+    /**
+     * Ignore annotations when building
+     * https://esbuild.github.io/api/#ignore-annotations
+     */
     ignoreAnnotations?: boolean;
   };
+
   /**
    * A list of modules to alias to other modules
    */
@@ -41,12 +57,21 @@ export interface ESMOptions {
    */
   worker?: boolean;
 
+  /**
+   * CJS Exports
+   */
   cjsExports?: string[];
 
+  /**
+   * Removes the x-typescript-types header when requesting url
+   */
   noDts?: boolean;
 }
 
-export function resolveESM(module: string, options?: ESMOptions): URL | undefined {
+export function resolveESM(
+  module: string,
+  options?: ESMOptions
+): URL | undefined {
   try {
     const pkg = parsePackage(module);
 
@@ -123,12 +148,13 @@ export function resolveESM(module: string, options?: ESMOptions): URL | undefine
   }
 }
 
-export async function resolveESMTypes(url: URL | string): Promise<string | null> {
+export async function resolveESMTypes(
+  url: URL | string
+): Promise<string | null> {
   if (url instanceof URL) {
-    url = url.toString()
+    url = url.toString();
   }
 
-  const headers = await fetch(url).then((res) => res.headers);
-
+  const headers = await ofetch.raw(url).then((res) => res.headers)
   return headers.get("x-typescript-types");
 }

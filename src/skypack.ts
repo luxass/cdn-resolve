@@ -1,3 +1,5 @@
+import { ofetch } from "ofetch";
+
 import { parsePackage } from "./utils";
 
 export interface SkypackOptions {
@@ -5,7 +7,10 @@ export interface SkypackOptions {
   dts?: boolean;
 }
 
-export function resolveSkypack(module: string, options?: SkypackOptions): URL | undefined {
+export function resolveSkypack(
+  module: string,
+  options?: SkypackOptions
+): URL | undefined {
   try {
     const pkg = parsePackage(module);
 
@@ -28,19 +33,27 @@ export function resolveSkypack(module: string, options?: SkypackOptions): URL | 
 export interface SkypackHeaders {
   typesUrl?: string;
   pinnedUrl?: string;
-  importUrl?: string
+  importUrl?: string;
 }
 
-export async function resolveSkypackHeaders(url: URL | string): Promise<SkypackHeaders> {
-  if (typeof url === "string") {
-    url = new URL(url);
+export async function resolveSkypackHeaders(
+  url: URL | string
+): Promise<SkypackHeaders> {
+  if (url instanceof URL) {
+    url = url.toString();
   }
 
-  const headers = await fetch(url).then((res) => res.headers);
+  const headers = await ofetch.raw(url).then((res) => res.headers);
 
   return {
-    typesUrl: headers.has("x-typescript-types") ? `https://cdn.skypack.dev${headers.get("x-typescript-types")}` : undefined,
-    pinnedUrl: headers.has("x-pinned-url") ? `https://cdn.skypack.dev${headers.get("x-pinned-url")}` : undefined,
-    importUrl: headers.has("x-import-url") ? `https://cdn.skypack.dev${headers.get("x-import-url")}` : undefined
+    typesUrl: headers.has("x-typescript-types") ?
+      `https://cdn.skypack.dev${headers.get("x-typescript-types")}` :
+      undefined,
+    pinnedUrl: headers.has("x-pinned-url") ?
+      `https://cdn.skypack.dev${headers.get("x-pinned-url")}` :
+      undefined,
+    importUrl: headers.has("x-import-url") ?
+      `https://cdn.skypack.dev${headers.get("x-import-url")}` :
+      undefined
   };
 }

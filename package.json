@@ -77,5 +77,8 @@
     "tsup": "^6.7.0",
     "typescript": "^5.0.2",
     "vitest": "^0.29.7"
+  },
+  "dependencies": {
+    "ofetch": "^1.0.1"
   }
 }
