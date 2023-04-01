@@ -1,4 +1,5 @@
 import { ofetch } from "ofetch";
+
 import { parsePackage } from "./utils";
 
 export interface ESMOptions {
@@ -155,6 +156,6 @@ export async function resolveESMTypes(
     url = url.toString();
   }
 
-  const headers = await ofetch.raw(url).then((res) => res.headers)
+  const headers = await ofetch.raw(url).then((res) => res.headers);
   return headers.get("x-typescript-types");
 }
