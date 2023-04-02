@@ -16,20 +16,16 @@ export function parsePackage(pkg: string): ParsedPackage {
     throw new Error(`Invalid package name: ${pkg}`);
   }
 
-  const name = matched.groups.name;
   const version = matched.groups?.version || "latest";
   const path = matched.groups?.path;
   const scope = matched.groups?.scope;
-
-  const full = scope ?
-    `@${scope}/${name}@${version}${path || ""}` :
-    `${name}@${version}${path || ""}`;
+  const name = scope ? `@${scope}/${matched.groups.name}` : matched.groups.name;
 
   return {
     name,
     version,
     path,
     scope,
-    full
+    full: `${name}@${version}${path || ""}`
   };
 }
