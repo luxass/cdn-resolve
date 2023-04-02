@@ -15,7 +15,7 @@ describe("packages with scopes", () => {
 
     expect(parsed).toEqual({
       scope: "babel",
-      name: "core",
+      name: "@babel/core",
       version: "latest",
       full: "@babel/core@latest"
     });
@@ -26,7 +26,7 @@ describe("packages with scopes", () => {
 
     expect(parsed).toEqual({
       scope: "babel",
-      name: "core",
+      name: "@babel/core",
       version: "7.21.3",
       path: "/lib/parse.js",
       full: "@babel/core@7.21.3/lib/parse.js"
@@ -38,7 +38,7 @@ describe("packages with scopes", () => {
 
     expect(parsed).toEqual({
       scope: "babel",
-      name: "core",
+      name: "@babel/core",
       version: "7.21.3",
       full: "@babel/core@7.21.3"
     });
@@ -49,7 +49,7 @@ describe("packages with scopes", () => {
 
     expect(parsed).toEqual({
       scope: "babel",
-      name: "core",
+      name: "@babel/core",
       version: "latest",
       path: "/lib/parse.js",
       full: "@babel/core@latest/lib/parse.js"
