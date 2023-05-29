@@ -135,7 +135,7 @@ test("resolve vue types", async () => {
   const esm = resolveESM("vue@3.2.47");
   const resolved = await resolveESMTypes(esm);
 
-  expect(resolved).toBe("https://esm.sh/v113/vue@3.2.47/dist/vue.d.ts");
+  expect(resolved).toBe("https://esm.sh/v118/vue@3.2.47/dist/vue.d.ts");
 });
 
 test("resolve vue types without header", async () => {
