@@ -2,10 +2,10 @@ import { ofetch } from "ofetch";
 
 import { parsePackage } from "./utils";
 
-export interface SkypackOptions {
-  min?: boolean;
-  dts?: boolean;
-}
+export type SkypackOptions = {
+  min?: boolean
+  dts?: boolean
+};
 
 export function resolveSkypack(
   module: string,
@@ -30,11 +30,11 @@ export function resolveSkypack(
   }
 }
 
-export interface SkypackHeaders {
-  typesUrl?: string;
-  pinnedUrl?: string;
-  importUrl?: string;
-}
+export type SkypackHeaders = {
+  typesUrl?: string
+  pinnedUrl?: string
+  importUrl?: string
+};
 
 export async function resolveSkypackHeaders(
   url: URL | string

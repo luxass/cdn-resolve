@@ -1,9 +1,9 @@
 import { parsePackage } from "./utils";
 
-export interface UnpkgOptions {
-  module?: boolean;
-  meta?: boolean;
-}
+export type UnpkgOptions = {
+  module?: boolean
+  meta?: boolean
+};
 
 export function resolveUnpkg(
   module: string,

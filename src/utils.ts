@@ -1,10 +1,10 @@
-export interface ParsedPackage {
-  name: string;
-  version: string;
-  path?: string;
-  scope?: string;
-  full: string;
-}
+export type ParsedPackage = {
+  name: string
+  version: string
+  path?: string
+  scope?: string
+  full: string
+};
 
 export function parsePackage(pkg: string): ParsedPackage {
   const matched =

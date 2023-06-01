@@ -22,6 +22,7 @@ Resolve React from [esm.sh](https://esm.sh)
 
 ```js
 import { resolveCDN } from "cdn-resolve";
+
 // You can also import the esm resolver directly
 import { resolveESM } from "cdn-resolve/esm";
 

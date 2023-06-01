@@ -2,72 +2,72 @@ import { ofetch } from "ofetch";
 
 import { parsePackage } from "./utils";
 
-export interface ESMOptions {
-  deps?: string[];
+export type ESMOptions = {
+  deps?: string[]
 
   /**
    * A list of dependencies to externalize
    * if true, all dependencies will be externalized
    */
-  external?: string[] | boolean;
+  external?: string[] | boolean
 
   /**
    * Pin a specific version to a module
    */
-  pin?: string;
+  pin?: string
 
   esbuild?: {
     /**
      * The target environment for the generated code
      */
-    target?: "es2015" | "es2022" | "esnext" | "deno" | "denonext";
+    target?: "es2015" | "es2022" | "esnext" | "deno" | "denonext"
 
     /**
      * Keep names when minifying
      * https://esbuild.github.io/api/#keep-names
      */
-    keepNames?: boolean;
+    keepNames?: boolean
 
     /**
      * Ignore annotations when building
      * https://esbuild.github.io/api/#ignore-annotations
      */
-    ignoreAnnotations?: boolean;
-  };
+    ignoreAnnotations?: boolean
+  }
 
   /**
    * A list of modules to alias to other modules
    */
-  alias?: Record<string, string>;
+  alias?: Record<string, string>
   /**
    * To enable tree shaking, you need to specify the list of exports to keep
    */
-  treeShake?: string[];
+  treeShake?: string[]
   /**
    * Bundle
    */
-  bundle?: boolean;
+  bundle?: boolean
 
   /**
    * Development Mode
    */
-  dev?: boolean;
+  dev?: boolean
 
   /**
    * Worker Mode
    */
-  worker?: boolean;
+  worker?: boolean
 
   /**
    * CJS Exports
    */
-  cjsExports?: string[];
+  cjsExports?: string[]
 
   /**
    * Removes the x-typescript-types header when requesting url
    */
-  noDts?: boolean;
-}
+  noDts?: boolean
+};
 
 export function resolveESM(
   module: string,
