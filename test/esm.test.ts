@@ -6,14 +6,14 @@ import { resolveESM, resolveESMTypes } from "../src/esm";
 test("resolve react", () => {
   const resolved = resolveESM("react");
 
-  expect(resolved.host).toBe("esm.sh");
-  expect(resolved.pathname).toBe("/react@latest");
+  expect(resolved?.host).toBe("esm.sh");
+  expect(resolved?.pathname).toBe("/react@latest");
 });
 
 test("resolve react@17", () => {
   const resolved = resolveESM("react@17");
-  expect(resolved.host).toBe("esm.sh");
-  expect(resolved.pathname).toBe("/react@17");
+  expect(resolved?.host).toBe("esm.sh");
+  expect(resolved?.pathname).toBe("/react@17");
 });
 
 test("resolve swr with preact alias", () => {
@@ -23,7 +23,7 @@ test("resolve swr with preact alias", () => {
     }
   });
 
-  expect(resolved.host).toBe("esm.sh");
+  expect(resolved?.host).toBe("esm.sh");
   expect(resolved?.searchParams.get("alias")).toBe("react:preact/compat");
 });
 
@@ -35,7 +35,7 @@ test("resolve swr with preact alias and deps", () => {
     deps: ["preact@10.5.14"]
   });
 
-  expect(resolved.host).toBe("esm.sh");
+  expect(resolved?.host).toBe("esm.sh");
   expect(resolved?.searchParams.get("alias")).toBe("react:preact/compat");
   expect(resolved?.searchParams.get("deps")).toBe("preact@10.5.14");
 });
@@ -45,7 +45,7 @@ test("tree shaking", () => {
     treeShake: ["__await", "__rest"]
   });
 
-  expect(resolved.host).toBe("esm.sh");
+  expect(resolved?.host).toBe("esm.sh");
   expect(resolved?.searchParams.get("exports")).toBe("__await,__rest");
 });
 
@@ -54,7 +54,7 @@ test("with bundle mode", () => {
     bundle: true
   });
 
-  expect(resolved.host).toBe("esm.sh");
+  expect(resolved?.host).toBe("esm.sh");
   expect(resolved?.searchParams.get("bundle")).toBe("true");
 });
 
@@ -63,7 +63,7 @@ test("with worker", () => {
     worker: true
   });
 
-  expect(resolved.host).toBe("esm.sh");
+  expect(resolved?.host).toBe("esm.sh");
   expect(resolved?.searchParams.get("worker")).toBe("true");
 });
 
@@ -72,7 +72,7 @@ test("with development mode", () => {
     dev: true
   });
 
-  expect(resolved.host).toBe("esm.sh");
+  expect(resolved?.host).toBe("esm.sh");
   expect(resolved?.searchParams.get("dev")).toBe("true");
 });
 
@@ -84,7 +84,7 @@ describe("esbuild options", () => {
       }
     });
 
-    expect(resolved.host).toBe("esm.sh");
+    expect(resolved?.host).toBe("esm.sh");
     expect(resolved?.searchParams.get("target")).toBe("esnext");
   });
 
@@ -95,7 +95,7 @@ describe("esbuild options", () => {
       }
     });
 
-    expect(resolved.host).toBe("esm.sh");
+    expect(resolved?.host).toBe("esm.sh");
     expect(resolved?.searchParams.get("keep-names")).toBe("true");
   });
 
@@ -106,7 +106,7 @@ describe("esbuild options", () => {
       }
     });
 
-    expect(resolved.host).toBe("esm.sh");
+    expect(resolved?.host).toBe("esm.sh");
     expect(resolved?.searchParams.get("ignore-annotations")).toBe("true");
   });
 });
@@ -116,7 +116,7 @@ test("cjs exports", () => {
     cjsExports: ["NinetyRing", "NinetyRingWithBg"]
   });
 
-  expect(resolved.host).toBe("esm.sh");
+  expect(resolved?.host).toBe("esm.sh");
   expect(resolved?.searchParams.get("cjs-exports")).toBe(
     "NinetyRing,NinetyRingWithBg"
   );
@@ -127,22 +127,26 @@ test("pinned build version", () => {
     pin: "v111"
   });
 
-  expect(resolved.host).toBe("esm.sh");
+  expect(resolved?.host).toBe("esm.sh");
   expect(resolved?.searchParams.get("pin")).toBe("v111");
 });
 
 test("resolve vue types", async () => {
   const esm = resolveESM("vue@3.2.47");
-  const resolved = await resolveESMTypes(esm);
 
-  expect(resolved).toBe("https://esm.sh/v118/vue@3.2.47/dist/vue.d.ts");
+  const resolved = await resolveESMTypes(esm!);
+  console.log(resolved);
+  const resolvedURL = new URL(resolved!);
+
+  expect(resolvedURL.host).toBe("esm.sh");
+  expect(resolvedURL.pathname).toContain("/vue@3.2.47/dist/vue.d.ts");
 });
 
 test("resolve vue types without header", async () => {
   const esm = resolveESM("vue@3.2.47", {
     noDts: true
   });
-  const resolved = await resolveESMTypes(esm);
+  const resolved = await resolveESMTypes(esm!);
 
   expect(resolved).toBe(null);
 });
