@@ -2,7 +2,7 @@
   "name": "cdn-resolve",
   "type": "module",
   "version": "0.1.5",
-  "packageManager": "pnpm@8.7.1",
+  "packageManager": "pnpm@8.7.5",
   "description": "Resolves import paths to their CDN equivalents",
   "author": {
     "name": "Lucas Nørgård",
