@@ -2,7 +2,7 @@ import { ofetch } from "ofetch";
 
 import { parsePackage } from "./utils";
 
-export type ESMOptions = {
+export interface ESMOptions {
   deps?: string[]
 
   /**
@@ -67,18 +67,18 @@ export type ESMOptions = {
    * Removes the x-typescript-types header when requesting url
    */
   noDts?: boolean
-};
+}
 
 export function resolveESM(
   module: string,
-  options?: ESMOptions
+  options?: ESMOptions,
 ): URL | undefined {
   try {
     const pkg = parsePackage(module);
 
     const url = new URL(
       `${options?.external === true ? "*" : ""}${pkg.full}`,
-      "https://esm.sh"
+      "https://esm.sh",
     );
 
     if (options?.deps) {
@@ -114,7 +114,7 @@ export function resolveESM(
         "alias",
         Object.entries(options.alias)
           .map(([key, value]) => `${key}:${value}`)
-          .join(",")
+          .join(","),
       );
     }
 
@@ -150,7 +150,7 @@ export function resolveESM(
 }
 
 export async function resolveESMTypes(
-  url: URL | string
+  url: URL | string,
 ): Promise<string | null> {
   if (url instanceof URL) {
     url = url.toString();

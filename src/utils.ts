@@ -1,15 +1,15 @@
-export type ParsedPackage = {
+export interface ParsedPackage {
   name: string
   version: string
   path?: string
   scope?: string
   full: string
-};
+}
 
 export function parsePackage(pkg: string): ParsedPackage {
-  const matched =
-    /^(@(?<scope>[^\/]+)\/(?<name>[^@\/]+))(?:@(?<version>[^\/]+))?(?<path>\/.*)?$/.exec(
-      pkg
+  const matched
+    = /^(@(?<scope>[^\/]+)\/(?<name>[^@\/]+))(?:@(?<version>[^\/]+))?(?<path>\/.*)?$/.exec(
+      pkg,
     ) || /^(?<name>[^@\/]+)(?:@(?<version>[^\/]+))?(?<path>\/.*)?$/.exec(pkg);
 
   if (!matched || !matched.groups?.name) {
@@ -26,6 +26,6 @@ export function parsePackage(pkg: string): ParsedPackage {
     version,
     path,
     scope,
-    full: `${name}@${version}${path || ""}`
+    full: `${name}@${version}${path || ""}`,
   };
 }

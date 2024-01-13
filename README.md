@@ -1,8 +1,9 @@
 # cdn-resolve
 
 [![npm version][npm-version-src]][npm-version-href]
+[![npm downloads][npm-downloads-src]][npm-downloads-href]
 
-> Resolves packages to their relative CDN URLS.
+Resolves packages to their relative CDN URLS.
 
 ## Features
 
@@ -13,7 +14,7 @@
 ## 📦 Installation
 
 ```sh
-pnpm install cdn-resolve
+npm install cdn-resolve
 ```
 
 ## 📚 Usage
@@ -89,20 +90,13 @@ const parsedWithPathAndVersion = parsePackage("vue@3.2.47/package.json");
 // }
 ```
 
-## 💻 Development
+## 📄 License
 
-- Clone this repository
-- Enable [Corepack](https://github.com/nodejs/corepack) using `corepack enable` (use `npm i -g corepack` for Node.js < 16.10)
-- Install dependencies using `pnpm install`
-- Run tests using `pnpm dev`
-
-## License
-
-Made with ❤️
-
-Published under [MIT License](./LICENCE).
+Published under [MIT License](./LICENSE).
 
 <!-- Badges -->
 
-[npm-version-src]: https://img.shields.io/npm/v/cdn-resolve?style=flat-square
+[npm-version-src]: https://img.shields.io/npm/v/cdn-resolve?style=flat&colorA=18181B&colorB=4169E1
 [npm-version-href]: https://npmjs.com/package/cdn-resolve
+[npm-downloads-src]: https://img.shields.io/npm/dm/cdn-resolve?style=flat&colorA=18181B&colorB=4169E1
+[npm-downloads-href]: https://npmjs.com/package/cdn-resolve

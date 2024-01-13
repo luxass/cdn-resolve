@@ -1,14 +1,14 @@
 {
   "name": "cdn-resolve",
-  "type": "module",
   "version": "0.1.5",
-  "packageManager": "pnpm@8.7.5",
   "description": "Resolves import paths to their CDN equivalents",
+  "type": "module",
   "author": {
     "name": "Lucas Nørgård",
     "email": "lucasnrgaard@gmail.com",
     "url": "https://luxass.dev"
   },
+  "packageManager": "pnpm@8.14.1",
   "license": "MIT",
   "homepage": "https://github.com/luxass/cdn-resolve",
   "repository": "https://github.com/luxass/cdn-resolve",
@@ -27,28 +27,28 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "require": "./dist/index.cjs",
-      "import": "./dist/index.js"
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
     },
     "./skypack": {
       "types": "./dist/skypack.d.ts",
-      "require": "./dist/skypack.cjs",
-      "import": "./dist/skypack.js"
+      "import": "./dist/skypack.js",
+      "require": "./dist/skypack.cjs"
     },
     "./esm": {
       "types": "./dist/esm.d.ts",
-      "require": "./dist/esm.cjs",
-      "import": "./dist/esm.js"
+      "import": "./dist/esm.js",
+      "require": "./dist/esm.cjs"
     },
     "./jsdelivr": {
       "types": "./dist/jsdelivr.d.ts",
-      "require": "./dist/jsdelivr.cjs",
-      "import": "./dist/jsdelivr.js"
+      "import": "./dist/jsdelivr.js",
+      "require": "./dist/jsdelivr.cjs"
     },
     "./unpkg": {
       "types": "./dist/unpkg.d.ts",
-      "require": "./dist/unpkg.cjs",
-      "import": "./dist/unpkg.js"
+      "import": "./dist/unpkg.js",
+      "require": "./dist/unpkg.cjs"
     },
     "./package.json": "./package.json"
   },
@@ -57,31 +57,32 @@
   "types": "./dist/index.d.ts",
   "files": [
     "dist",
-    "skypack.d.ts",
     "esm.d.ts",
     "jsdelivr.d.ts",
+    "skypack.d.ts",
     "unpkg.d.ts"
   ],
   "engines": {
-    "node": ">=16"
+    "node": ">=18"
   },
   "scripts": {
     "build": "tsup",
-    "dev": "vitest",
+    "dev": "tsup --watch",
     "test": "vitest run",
+    "test:watch": "vitest",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "ofetch": "^1.1.1"
+    "ofetch": "^1.3.3"
   },
   "devDependencies": {
-    "@luxass/eslint-config": "^3.2.2",
+    "@luxass/eslint-config": "^4.2.1",
     "@types/node": "^18.16.19",
-    "eslint": "^8.44.0",
-    "tsup": "^7.1.0",
-    "typescript": "^5.1.6",
-    "vitest": "^0.34.0"
+    "eslint": "^8.56.0",
+    "eslint-plugin-format": "^0.1.0",
+    "tsup": "^8.0.1",
+    "typescript": "^5.3.3",
+    "vitest": "^1.2.0"
   }
 }

@@ -1,13 +1,13 @@
 import { parsePackage } from "./utils";
 
-export type UnpkgOptions = {
+export interface UnpkgOptions {
   module?: boolean
   meta?: boolean
-};
+}
 
 export function resolveUnpkg(
   module: string,
-  options?: UnpkgOptions
+  options?: UnpkgOptions,
 ): URL | undefined {
   try {
     const pkg = parsePackage(module);

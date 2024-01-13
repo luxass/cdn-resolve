@@ -4,7 +4,7 @@ import {
   type SkypackHeaders,
   type SkypackOptions,
   resolveSkypack,
-  resolveSkypackHeaders
+  resolveSkypackHeaders,
 } from "./skypack";
 import { resolveUnpkg } from "./unpkg";
 
@@ -15,7 +15,7 @@ export {
   resolveJSDelivr,
   resolveSkypack,
   resolveSkypackHeaders,
-  resolveUnpkg
+  resolveUnpkg,
 };
 export type { ESMOptions, SkypackHeaders, SkypackOptions };
 
@@ -23,7 +23,7 @@ export const CDN_URLS = {
   skypack: "https://cdn.skypack.dev",
   esm: "https://esm.sh",
   unpkg: "https://unpkg.com",
-  jsdelivr: "https://cdn.jsdelivr.net/npm"
+  jsdelivr: "https://cdn.jsdelivr.net/npm",
 };
 
 export type SupportedCDNS = "skypack" | "esm" | "unpkg" | "jsdelivr";

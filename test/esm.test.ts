@@ -1,38 +1,37 @@
-
-import { describe, expect, test } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import { resolveESM, resolveESMTypes } from "../src/esm";
 
-test("resolve react", () => {
+it("resolve react", () => {
   const resolved = resolveESM("react");
 
   expect(resolved?.host).toBe("esm.sh");
   expect(resolved?.pathname).toBe("/react@latest");
 });
 
-test("resolve react@17", () => {
+it("resolve react@17", () => {
   const resolved = resolveESM("react@17");
   expect(resolved?.host).toBe("esm.sh");
   expect(resolved?.pathname).toBe("/react@17");
 });
 
-test("resolve swr with preact alias", () => {
+it("resolve swr with preact alias", () => {
   const resolved = resolveESM("swr", {
     alias: {
-      react: "preact/compat"
-    }
+      react: "preact/compat",
+    },
   });
 
   expect(resolved?.host).toBe("esm.sh");
   expect(resolved?.searchParams.get("alias")).toBe("react:preact/compat");
 });
 
-test("resolve swr with preact alias and deps", () => {
+it("resolve swr with preact alias and deps", () => {
   const resolved = resolveESM("swr", {
     alias: {
-      react: "preact/compat"
+      react: "preact/compat",
     },
-    deps: ["preact@10.5.14"]
+    deps: ["preact@10.5.14"],
   });
 
   expect(resolved?.host).toBe("esm.sh");
@@ -40,36 +39,36 @@ test("resolve swr with preact alias and deps", () => {
   expect(resolved?.searchParams.get("deps")).toBe("preact@10.5.14");
 });
 
-test("tree shaking", () => {
+it("tree shaking", () => {
   const resolved = resolveESM("tslib", {
-    treeShake: ["__await", "__rest"]
+    treeShake: ["__await", "__rest"],
   });
 
   expect(resolved?.host).toBe("esm.sh");
   expect(resolved?.searchParams.get("exports")).toBe("__await,__rest");
 });
 
-test("with bundle mode", () => {
+it("with bundle mode", () => {
   const resolved = resolveESM("tslib", {
-    bundle: true
+    bundle: true,
   });
 
   expect(resolved?.host).toBe("esm.sh");
   expect(resolved?.searchParams.get("bundle")).toBe("true");
 });
 
-test("with worker", () => {
+it("with worker", () => {
   const resolved = resolveESM("monaco-editor/esm/vs/editor/editor.worker", {
-    worker: true
+    worker: true,
   });
 
   expect(resolved?.host).toBe("esm.sh");
   expect(resolved?.searchParams.get("worker")).toBe("true");
 });
 
-test("with development mode", () => {
+it("with development mode", () => {
   const resolved = resolveESM("react", {
-    dev: true
+    dev: true,
   });
 
   expect(resolved?.host).toBe("esm.sh");
@@ -77,33 +76,33 @@ test("with development mode", () => {
 });
 
 describe("esbuild options", () => {
-  test("with target", () => {
+  it("with target", () => {
     const resolved = resolveESM("react", {
       esbuild: {
-        target: "esnext"
-      }
+        target: "esnext",
+      },
     });
 
     expect(resolved?.host).toBe("esm.sh");
     expect(resolved?.searchParams.get("target")).toBe("esnext");
   });
 
-  test("with keep-names", () => {
+  it("with keep-names", () => {
     const resolved = resolveESM("react", {
       esbuild: {
-        keepNames: true
-      }
+        keepNames: true,
+      },
     });
 
     expect(resolved?.host).toBe("esm.sh");
     expect(resolved?.searchParams.get("keep-names")).toBe("true");
   });
 
-  test("with target", () => {
+  it("with ignore annotations", () => {
     const resolved = resolveESM("react", {
       esbuild: {
-        ignoreAnnotations: true
-      }
+        ignoreAnnotations: true,
+      },
     });
 
     expect(resolved?.host).toBe("esm.sh");
@@ -111,40 +110,39 @@ describe("esbuild options", () => {
   });
 });
 
-test("cjs exports", () => {
+it("cjs exports", () => {
   const resolved = resolveESM("react-svg-spinners@0.3.1", {
-    cjsExports: ["NinetyRing", "NinetyRingWithBg"]
+    cjsExports: ["NinetyRing", "NinetyRingWithBg"],
   });
 
   expect(resolved?.host).toBe("esm.sh");
   expect(resolved?.searchParams.get("cjs-exports")).toBe(
-    "NinetyRing,NinetyRingWithBg"
+    "NinetyRing,NinetyRingWithBg",
   );
 });
 
-test("pinned build version", () => {
+it("pinned build version", () => {
   const resolved = resolveESM("react-dom", {
-    pin: "v111"
+    pin: "v111",
   });
 
   expect(resolved?.host).toBe("esm.sh");
   expect(resolved?.searchParams.get("pin")).toBe("v111");
 });
 
-test("resolve vue types", async () => {
+it("resolve vue types", async () => {
   const esm = resolveESM("vue@3.2.47");
 
   const resolved = await resolveESMTypes(esm!);
-  console.log(resolved);
   const resolvedURL = new URL(resolved!);
 
   expect(resolvedURL.host).toBe("esm.sh");
   expect(resolvedURL.pathname).toContain("/vue@3.2.47/dist/vue.d.ts");
 });
 
-test("resolve vue types without header", async () => {
+it("resolve vue types without header", async () => {
   const esm = resolveESM("vue@3.2.47", {
-    noDts: true
+    noDts: true,
   });
   const resolved = await resolveESMTypes(esm!);
 
