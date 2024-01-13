@@ -26,34 +26,59 @@
   ],
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     },
     "./skypack": {
-      "types": "./dist/skypack.d.ts",
-      "import": "./dist/skypack.js",
-      "require": "./dist/skypack.cjs"
+      "import": {
+        "types": "./dist/skypack.d.ts",
+        "default": "./dist/skypack.mjs"
+      },
+      "require": {
+        "types": "./dist/skypack.d.cts",
+        "default": "./dist/skypack.cjs"
+      }
     },
     "./esm": {
-      "types": "./dist/esm.d.ts",
-      "import": "./dist/esm.js",
-      "require": "./dist/esm.cjs"
+      "import": {
+        "types": "./dist/esm.d.ts",
+        "default": "./dist/esm.mjs"
+      },
+      "require": {
+        "types": "./dist/esm.d.cts",
+        "default": "./dist/esm.cjs"
+      }
     },
     "./jsdelivr": {
-      "types": "./dist/jsdelivr.d.ts",
-      "import": "./dist/jsdelivr.js",
-      "require": "./dist/jsdelivr.cjs"
+      "import": {
+        "types": "./dist/jsdelivr.d.ts",
+        "default": "./dist/jsdelivr.mjs"
+      },
+      "require": {
+        "types": "./dist/jsdelivr.d.cts",
+        "default": "./dist/jsdelivr.cjs"
+      }
     },
     "./unpkg": {
-      "types": "./dist/unpkg.d.ts",
-      "import": "./dist/unpkg.js",
-      "require": "./dist/unpkg.cjs"
+      "import": {
+        "types": "./dist/unpkg.d.ts",
+        "default": "./dist/unpkg.mjs"
+      },
+      "require": {
+        "types": "./dist/unpkg.d.cts",
+        "default": "./dist/unpkg.cjs"
+      }
     },
     "./package.json": "./package.json"
   },
   "main": "./dist/index.cjs",
-  "module": "./dist/index.js",
+  "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "files": [
     "dist",
