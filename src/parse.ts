@@ -16,8 +16,8 @@ export interface ParsedPackage {
  * The version is always set to "latest" if not specified.
  */
 export function parsePackage(pkg: string): ParsedPackage {
-  const matched =
-    /^(@(?<scope>[^\/]+)\/(?<name>[^@\/]+))(?:@(?<version>[^\/]+))?(?<path>\/.*)?$/.exec(
+  const matched
+    = /^(@(?<scope>[^\/]+)\/(?<name>[^@\/]+))(?:@(?<version>[^\/]+))?(?<path>\/.*)?$/.exec(
       pkg,
     ) || /^(?<name>[^@\/]+)(?:@(?<version>[^\/]+))?(?<path>\/.*)?$/.exec(pkg);
 
