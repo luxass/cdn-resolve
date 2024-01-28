@@ -1,24 +1,25 @@
 import { expect, it } from "vitest";
 
-import { resolveJSDelivr } from "../src/jsdelivr";
+import { buildJSDelivrUrl } from "../src/jsdelivr";
 
-it("resolve react", () => {
-  const resolved = resolveJSDelivr("react");
-
-  expect(resolved?.host).toBe("cdn.jsdelivr.net");
-  expect(resolved?.pathname).toBe("/react@latest");
+it("should build the JSDelivr URL with the given module", () => {
+  const module = "lodash@4.17.21";
+  const url = buildJSDelivrUrl(module);
+  expect(url.toString()).toBe("https://cdn.jsdelivr.net/npm/lodash@4.17.21");
 });
 
-it("resolve react@17", () => {
-  const resolved = resolveJSDelivr("react@17");
-
-  expect(resolved?.host).toBe("cdn.jsdelivr.net");
-  expect(resolved?.pathname).toBe("/react@17");
+it("should build the JSDelivr URL with the given scoped module", () => {
+  const module = "@types/react@16.9.0";
+  const url = buildJSDelivrUrl(module);
+  expect(url.toString()).toBe(
+    "https://cdn.jsdelivr.net/npm/@types/react@16.9.0",
+  );
 });
 
-it("resolve react with version and path", () => {
-  const resolved = resolveJSDelivr("react@17/jsx-dev-runtime.js");
-
-  expect(resolved?.host).toBe("cdn.jsdelivr.net");
-  expect(resolved?.pathname).toBe("/react@17/jsx-dev-runtime.js");
+it("should build the JSDelivr URL with the given module and path", () => {
+  const module = "express@4.17.1/router/index.js";
+  const url = buildJSDelivrUrl(module);
+  expect(url.toString()).toBe(
+    "https://cdn.jsdelivr.net/npm/express@4.17.1/router/index.js",
+  );
 });

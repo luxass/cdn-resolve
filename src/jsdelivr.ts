@@ -1,14 +1,15 @@
-import { parsePackage } from "./utils";
+import { parsePackage } from "./parse";
 
-export function resolveJSDelivr(module: string): URL | undefined {
+/**
+ * Builds a JSDelivr URL for the specified module.
+ * @param {string} module - The name of the module.
+ * @returns {URL} The JSDelivr URL for the module.
+ */
+export function buildJSDelivrUrl(module: string): URL | undefined {
   try {
     const pkg = parsePackage(module);
-
-    const url = new URL(pkg.full, "https://cdn.jsdelivr.net/npm");
-
-    return url;
-  } catch (e) {
-    console.error(e);
+    return new URL(pkg.full, "https://cdn.jsdelivr.net/npm/");
+  } catch (err) {
     return undefined;
   }
 }
