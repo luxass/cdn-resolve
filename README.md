@@ -22,22 +22,21 @@ npm install cdn-resolve
 Resolve React from [esm.sh](https://esm.sh)
 
 ```js
-import { resolveCDN } from "cdn-resolve";
+import { buildCDNUrl } from "cdn-resolve";
 
-// You can also import the esm resolver directly
-import { resolveESM } from "cdn-resolve/esm";
+// You can also import the esm builder directly
+import { buildESMUrl } from "cdn-resolve/esm";
 
-const resolver = resolveESM("esm");
+const esm = buildCDNUrl("esm");
 
-resolver("swr", {
+esm("swr", {
   alias: {
     react: "preact/compat"
   }
 });
-
 // => https://esm.sh/swr?alias=react:preact/compat
 
-resolveESM("swr", {
+buildESMUrl("swr", {
   alias: {
     react: "preact/compat"
   }
@@ -49,9 +48,9 @@ resolveESM("swr", {
 Resolve typedefs for React from [esm.sh](https://esm.sh)
 
 ```js
-import { resolveESM, resolveESMTypes } from "cdn-resolve/esm";
+import { buildESMUrl } from "cdn-resolve/esm";
 
-const resolved = resolveESM("swr@2.1.1", {
+const resolved = buildESMUrl("swr@2.1.1", {
   alias: {
     react: "preact/compat"
   }
@@ -59,7 +58,7 @@ const resolved = resolveESM("swr@2.1.1", {
 
 const typesUrl = await resolveESMTypes(resolved);
 
-// => https://esm.sh/v113/swr@2.1.1/X-YS9yZWFjdDpwcmVhY3QvY29tcGF0/core/dist/index.d.ts
+// => https://esm.sh/v135/swr@2.1.1/X-YS9yZWFjdDpwcmVhY3QvY29tcGF0/core/dist/index.d.ts
 ```
 
 Parse a Package Name
