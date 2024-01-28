@@ -1,18 +1,24 @@
-import { parsePackage } from "./utils";
+import { parsePackage } from "./parse";
 
 export interface UnpkgOptions {
-  module?: boolean
-  meta?: boolean
+  module?: boolean;
+  meta?: boolean;
 }
 
-export function resolveUnpkg(
+/**
+ * Builds the URL for the specified module on unpkg.com.
+ * @param {string} module - The name of the module.
+ * @param {UnpkgOptions} options - configuration options.
+ * @returns {URL} The URL for the module on unpkg.com.
+ */
+export function buildUnpkgUrl(
   module: string,
   options?: UnpkgOptions,
 ): URL | undefined {
   try {
     const pkg = parsePackage(module);
 
-    const url = new URL(pkg.full, "https://unpkg.com");
+    const url = new URL(pkg.full, "https://unpkg.com/");
 
     if (options?.meta) {
       url.searchParams.set("meta", "true");
@@ -23,8 +29,7 @@ export function resolveUnpkg(
     }
 
     return url;
-  } catch (e) {
-    console.error(e);
+  } catch (err) {
     return undefined;
   }
 }

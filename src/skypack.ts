@@ -1,13 +1,17 @@
-import { ofetch } from "ofetch";
-
-import { parsePackage } from "./utils";
+import { parsePackage } from "./parse";
 
 export interface SkypackOptions {
-  min?: boolean
-  dts?: boolean
+  min?: boolean;
+  dts?: boolean;
 }
 
-export function resolveSkypack(
+/**
+ * Build a Skypack URL for a given module.
+ * @param {string} module - The module to resolve.
+ * @param {SkypackOptions} options - configuration options.
+ * @returns {URL} The build Skypack URL.
+ */
+export function buildSkypackUrl(
   module: string,
   options?: SkypackOptions,
 ): URL | undefined {
@@ -23,19 +27,24 @@ export function resolveSkypack(
     if (options?.min) {
       url.searchParams.set("min", "true");
     }
+
     return url;
-  } catch (e) {
-    console.error(e);
+  } catch (err) {
     return undefined;
   }
 }
 
 export interface SkypackHeaders {
-  typesUrl?: string
-  pinnedUrl?: string
-  importUrl?: string
+  typesUrl?: string;
+  pinnedUrl?: string;
+  importUrl?: string;
 }
 
+/**
+ * Resolves the Skypack URL and retrieves the necessary information from the headers.
+ * @param {URL | string} url - The Skypack URL to resolve.
+ * @returns {SkypackHeaders} A promise that resolves to a SkypackResult object containing the resolved URLs.
+ */
 export async function resolveSkypackHeaders(
   url: URL | string,
 ): Promise<SkypackHeaders> {
@@ -43,7 +52,7 @@ export async function resolveSkypackHeaders(
     url = url.toString();
   }
 
-  const headers = await ofetch.raw(url).then((res) => res.headers);
+  const headers = await fetch(url).then((res) => res.headers);
 
   return {
     typesUrl: headers.has("x-typescript-types")
