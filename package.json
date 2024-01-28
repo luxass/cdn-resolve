@@ -8,7 +8,7 @@
     "email": "lucasnrgaard@gmail.com",
     "url": "https://luxass.dev"
   },
-  "packageManager": "pnpm@8.14.1",
+  "packageManager": "pnpm@8.15.0",
   "license": "MIT",
   "homepage": "https://github.com/luxass/cdn-resolve",
   "repository": "https://github.com/luxass/cdn-resolve",
@@ -33,6 +33,16 @@
       "require": {
         "types": "./dist/index.d.cts",
         "default": "./dist/index.cjs"
+      }
+    },
+    "./parse": {
+      "import": {
+        "types": "./dist/parse.d.ts",
+        "default": "./dist/parse.mjs"
+      },
+      "require": {
+        "types": "./dist/parse.d.cts",
+        "default": "./dist/parse.cjs"
       }
     },
     "./skypack": {
@@ -81,11 +91,7 @@
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "files": [
-    "dist",
-    "esm.d.ts",
-    "jsdelivr.d.ts",
-    "skypack.d.ts",
-    "unpkg.d.ts"
+    "dist"
   ],
   "engines": {
     "node": ">=18"
@@ -95,19 +101,16 @@
     "dev": "tsup --watch",
     "test": "vitest run",
     "test:watch": "vitest",
-    "lint": "eslint .",
+    "lint": "eslint . --report-unused-disable-directives",
     "typecheck": "tsc --noEmit"
   },
-  "dependencies": {
-    "ofetch": "^1.3.3"
-  },
   "devDependencies": {
-    "@luxass/eslint-config": "^4.2.1",
+    "@luxass/eslint-config": "^4.2.6",
     "@types/node": "^18.16.19",
     "eslint": "^8.56.0",
     "eslint-plugin-format": "^0.1.0",
     "tsup": "^8.0.1",
     "typescript": "^5.3.3",
-    "vitest": "^1.2.0"
+    "vitest": "^1.2.2"
   }
 }
