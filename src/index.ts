@@ -18,6 +18,11 @@ export {
   buildUnpkgUrl,
 };
 
+export type {
+  ParsedPackage,
+} from "./parse";
+export { parsePackage } from "./parse";
+
 export type { ESMOptions, SkypackHeaders, SkypackOptions, UnpkgOptions };
 
 export const CDN_URLS = {
