@@ -17,9 +17,9 @@ export interface ParsedPackage {
  */
 export function parsePackage(pkg: string): ParsedPackage {
   const matched
-    = /^(@(?<scope>[^\/]+)\/(?<name>[^@\/]+))(?:@(?<version>[^\/]+))?(?<path>\/.*)?$/.exec(
+    = /^(@(?<scope>[^/]+)\/(?<name>[^@/]+))(?:@(?<version>[^/]+))?(?<path>\/.*)?$/.exec(
       pkg,
-    ) || /^(?<name>[^@\/]+)(?:@(?<version>[^\/]+))?(?<path>\/.*)?$/.exec(pkg);
+    ) || /^(?<name>[^@/]+)(?:@(?<version>[^/]+))?(?<path>\/.*)?$/.exec(pkg);
 
   if (!matched || !matched.groups?.name) {
     throw new Error(`Invalid package name: ${pkg}`);
