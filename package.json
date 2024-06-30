@@ -11,7 +11,10 @@
   "packageManager": "pnpm@9.4.0",
   "license": "MIT",
   "homepage": "https://github.com/luxass/cdn-resolve",
-  "repository": "https://github.com/luxass/cdn-resolve",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/luxass/cdn-resolve.git"
+  },
   "bugs": {
     "url": "https://github.com/luxass/cdn-resolve/issues"
   },
