@@ -8,7 +8,7 @@
     "email": "lucasnrgaard@gmail.com",
     "url": "https://luxass.dev"
   },
-  "packageManager": "pnpm@8.15.0",
+  "packageManager": "pnpm@8.15.8",
   "license": "MIT",
   "homepage": "https://github.com/luxass/cdn-resolve",
   "repository": "https://github.com/luxass/cdn-resolve",
