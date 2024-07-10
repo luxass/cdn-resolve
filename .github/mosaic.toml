@@ -1,0 +1,14 @@
+# this file is used to generate a list of projects that
+# should be showcases on my website.
+
+# read more here: https://mosaic.luxass.dev
+# schema can be found here: https://mosaic.luxass.dev/json-schema.json
+
+[project]
+name = "tsup-problem-matchers"
+
+[website]
+enabled = true
+
+[readme]
+enabled = true
