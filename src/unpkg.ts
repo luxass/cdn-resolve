@@ -29,7 +29,7 @@ export function buildUnpkgUrl(
     }
 
     return url;
-  } catch (err) {
+  } catch {
     return undefined;
   }
 }

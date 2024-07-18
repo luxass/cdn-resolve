@@ -326,7 +326,7 @@ export function buildESMUrl(
     }
 
     return url;
-  } catch (err) {
+  } catch {
     return undefined;
   }
 }

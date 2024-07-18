@@ -9,7 +9,7 @@ export function buildJSDelivrUrl(module: string): URL | undefined {
   try {
     const pkg = parsePackage(module);
     return new URL(pkg.full, "https://cdn.jsdelivr.net/npm/");
-  } catch (err) {
+  } catch {
     return undefined;
   }
 }

@@ -29,7 +29,7 @@ export function buildSkypackUrl(
     }
 
     return url;
-  } catch (err) {
+  } catch {
     return undefined;
   }
 }
