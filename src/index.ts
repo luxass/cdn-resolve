@@ -1,21 +1,21 @@
-import { buildESMUrl, resolveESMTypes } from "./esm";
 import type { ESMOptions } from "./esm";
+import type { SkypackHeaders, SkypackOptions } from "./skypack";
 
+import type { UnpkgOptions } from "./unpkg";
+
+import { buildESMUrl, resolveESMTypes } from "./esm";
 import { buildJSDelivrUrl } from "./jsdelivr";
 
 import { buildSkypackUrl, resolveSkypackHeaders } from "./skypack";
-import type { SkypackHeaders, SkypackOptions } from "./skypack";
-
 import { buildUnpkgUrl } from "./unpkg";
-import type { UnpkgOptions } from "./unpkg";
 
 export {
   buildESMUrl,
-  resolveESMTypes,
   buildJSDelivrUrl,
   buildSkypackUrl,
-  resolveSkypackHeaders,
   buildUnpkgUrl,
+  resolveESMTypes,
+  resolveSkypackHeaders,
 };
 
 export type {
