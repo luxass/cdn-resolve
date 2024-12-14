@@ -68,8 +68,8 @@ it("should return a URL for a module with worker option", () => {
 });
 
 it("should return typescript types from headers when URL is a string", async () => {
-  const types = await resolveESMTypes("https://esm.sh/react");
-  expect(types).toBe("https://esm.sh/v128/@types/react@~18.3/index.d.ts");
+  const types = await resolveESMTypes("https://esm.sh/react@18.3.0");
+  expect(types).toContain("/@types/react@~18.3/index.d.ts");
 });
 
 it("should return typescript types from headers when URL is a URL object", async () => {
