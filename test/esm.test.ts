@@ -69,12 +69,21 @@ it("should return a URL for a module with worker option", () => {
 
 it("should return typescript types from headers when URL is a string", async () => {
   const types = await resolveESMTypes("https://esm.sh/react@18.3.0");
-  expect(types).toContain("/@types/react@~18.3/index.d.ts");
+  expect(types).not.toBeNull();
+
+  const url = new URL(types!);
+
+  expect(url.hostname).toBe("esm.sh");
+  expect(url.pathname).toMatch(/^\/@types\/react@~18\.3\.\d+\/index\.d\.ts$/);
 });
 
 it("should return typescript types from headers when URL is a URL object", async () => {
   const types = await resolveESMTypes(new URL("https://esm.sh/react@18.2.0"));
-  expect(types).toBe("https://esm.sh/v128/@types/react@~18.2/index.d.ts");
+
+  const url = new URL(types!);
+
+  expect(url.hostname).toBe("esm.sh");
+  expect(url.pathname).toMatch(/^\/@types\/react@~18\.2\.\d+\/index\.d\.ts$/);
 });
 
 it("should return null when x-typescript-types header is not present", async () => {
