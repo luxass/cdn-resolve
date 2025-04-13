@@ -22,7 +22,6 @@
     "resolve",
     "cdn",
     "import",
-    "skypack",
     "unpkg",
     "jsdelivr",
     "esm.sh"
@@ -46,16 +45,6 @@
       "require": {
         "types": "./dist/parse.d.cts",
         "default": "./dist/parse.cjs"
-      }
-    },
-    "./skypack": {
-      "import": {
-        "types": "./dist/skypack.d.ts",
-        "default": "./dist/skypack.mjs"
-      },
-      "require": {
-        "types": "./dist/skypack.d.cts",
-        "default": "./dist/skypack.cjs"
       }
     },
     "./esm": {

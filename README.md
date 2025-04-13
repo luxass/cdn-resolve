@@ -5,10 +5,14 @@
 
 Resolves packages to their relative CDN URLS.
 
+> [!NOTE]
+> Skypack was recently removed in version v2.0.0, since it wa unmainted and new code was breaking it.
+> So if you are using Skypack, please use version v1.4.1
+
 ## Features
 
 - Resolves a package name to a CDN URL
-- Supports all major CDNs (esm.sh, skypack, unpkg, jsdelivr, etc.)
+- Supports all major CDNs (esm.sh, unpkg, jsdelivr, etc.)
 - Resolves types
 
 ## 📦 Installation
