@@ -1,6 +1,6 @@
 {
   "name": "cdn-resolve",
-  "version": "1.4.0",
+  "version": "2.0.0",
   "description": "Resolves import paths to their CDN equivalents",
   "type": "module",
   "author": {
