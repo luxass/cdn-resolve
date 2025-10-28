@@ -5,12 +5,15 @@ on:
     tags:
       - "v*"
 
+permissions: {}
+
 jobs:
   release:
     permissions:
       id-token: write
       contents: write
     runs-on: ubuntu-latest
+    environment: npm-registry
     steps:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
@@ -25,21 +28,37 @@ jobs:
         with:
           registry-url: "https://registry.npmjs.org"
           node-version: lts/*
+          package-manager-cache: false
 
-      - run: pnpx changelogithub
+      - name: update npm (oidc)
+        run: npm install -g npm@latest
+
+      - name: generate changelog
+        run: pnpx changelogithub
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: install dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
 
       - name: build
         run: pnpm build
 
+      - name: detect tag
+        id: tag
+        run: |
+          LATEST_TAG=$(git describe --tags --abbrev=0)
+
+          if [[ "$LATEST_TAG" == *-* ]]; then
+            echo "tag=next" >> $GITHUB_OUTPUT
+          else
+            echo "tag=latest" >> $GITHUB_OUTPUT
+          fi
+
       - name: publish to npm
-        run: npm publish --access public --no-git-checks
+        run: pnpm publish --tag $TAG --access public --no-git-checks
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          TAG: ${{ steps.tag.outputs.tag }}
           NPM_CONFIG_PROVENANCE: true
 
       - name: print dirty files
