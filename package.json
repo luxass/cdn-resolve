@@ -8,7 +8,7 @@
     "email": "lucasnrgaard@gmail.com",
     "url": "https://luxass.dev"
   },
-  "packageManager": "pnpm@10.19.0",
+  "packageManager": "pnpm@10.20.0",
   "license": "MIT",
   "homepage": "https://github.com/luxass/cdn-resolve",
   "repository": {
@@ -67,18 +67,18 @@
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "@luxass/eslint-config": "6.0.1",
+    "@luxass/eslint-config": "6.0.3",
     "@types/node": "22.15.30",
-    "eslint": "9.38.0",
+    "eslint": "9.39.1",
     "eslint-plugin-format": "1.0.2",
     "publint": "0.3.15",
-    "tsdown": "0.15.11",
+    "tsdown": "0.16.1",
     "typescript": "5.9.3",
-    "vitest": "4.0.4"
+    "vitest": "4.0.8"
   },
   "pnpm": {
     "overrides": {
-      "rolldown": "1.0.0-beta.45"
+      "rolldown": "1.0.0-beta.47"
     }
   }
 }
