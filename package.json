@@ -28,29 +28,29 @@
   ],
   "exports": {
     ".": {
-      "import": "./dist/index.js",
+      "import": "./dist/index.mjs",
       "require": "./dist/index.cjs"
     },
     "./esm": {
-      "import": "./dist/esm.js",
+      "import": "./dist/esm.mjs",
       "require": "./dist/esm.cjs"
     },
     "./jsdelivr": {
-      "import": "./dist/jsdelivr.js",
+      "import": "./dist/jsdelivr.mjs",
       "require": "./dist/jsdelivr.cjs"
     },
     "./parse": {
-      "import": "./dist/parse.js",
+      "import": "./dist/parse.mjs",
       "require": "./dist/parse.cjs"
     },
     "./unpkg": {
-      "import": "./dist/unpkg.js",
+      "import": "./dist/unpkg.mjs",
       "require": "./dist/unpkg.cjs"
     },
     "./package.json": "./package.json"
   },
   "main": "./dist/index.cjs",
-  "module": "./dist/index.js",
+  "module": "./dist/index.mjs",
   "types": "./dist/index.d.cts",
   "files": [
     "dist"
