@@ -1,7 +1,13 @@
 import { defineConfig } from "tsdown";
 
 export default defineConfig({
-  entry: ["./src/*.ts"],
+  entry: [
+    "./src/index.ts",
+    "./src/esm.ts",
+    "./src/jsdelivr.ts",
+    "./src/parse.ts",
+    "./src/unpkg.ts",
+  ],
   format: ["cjs", "esm"],
   clean: true,
   dts: true,

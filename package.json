@@ -2,30 +2,35 @@
   "name": "cdn-resolve",
   "version": "2.1.2",
   "description": "Resolves import paths to their CDN equivalents",
-  "type": "module",
+  "keywords": [
+    "cdn",
+    "esm.sh",
+    "import",
+    "jsdelivr",
+    "resolve",
+    "unpkg"
+  ],
+  "homepage": "https://github.com/luxass/cdn-resolve",
+  "bugs": {
+    "url": "https://github.com/luxass/cdn-resolve/issues"
+  },
+  "license": "MIT",
   "author": {
     "name": "Lucas Nørgård",
     "email": "lucasnrgaard@gmail.com",
     "url": "https://luxass.dev"
   },
-  "packageManager": "pnpm@10.34.5",
-  "license": "MIT",
-  "homepage": "https://github.com/luxass/cdn-resolve",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/luxass/cdn-resolve.git"
   },
-  "bugs": {
-    "url": "https://github.com/luxass/cdn-resolve/issues"
-  },
-  "keywords": [
-    "resolve",
-    "cdn",
-    "import",
-    "unpkg",
-    "jsdelivr",
-    "esm.sh"
+  "files": [
+    "dist"
   ],
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.cts",
   "exports": {
     ".": {
       "import": "./dist/index.mjs",
@@ -49,36 +54,28 @@
     },
     "./package.json": "./package.json"
   },
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.cts",
-  "files": [
-    "dist"
-  ],
-  "engines": {
-    "node": ">=20"
-  },
   "scripts": {
     "build": "tsdown",
     "dev": "tsdown --watch",
     "test": "vitest run",
     "test:watch": "vitest",
-    "lint": "eslint .",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
+    "fmt": "oxfmt",
+    "fmt:check": "oxfmt --check",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "@luxass/eslint-config": "6.0.3",
-    "@types/node": "22.15.30",
-    "eslint": "9.39.1",
-    "eslint-plugin-format": "1.0.2",
-    "publint": "0.3.15",
-    "tsdown": "0.16.1",
-    "typescript": "5.9.3",
-    "vitest": "4.0.8"
+    "@types/node": "catalog:types",
+    "oxfmt": "catalog:dev",
+    "oxlint": "catalog:dev",
+    "publint": "catalog:dev",
+    "tsdown": "catalog:dev",
+    "typescript": "catalog:dev",
+    "vitest": "catalog:test"
   },
-  "pnpm": {
-    "overrides": {
-      "rolldown": "1.0.0-beta.47"
-    }
-  }
+  "engines": {
+    "node": ">=22"
+  },
+  "packageManager": "pnpm@12.21.0"
 }

@@ -1,14 +1,9 @@
-import { parsePackage } from "./parse";
+import { createCdnPackageUrl } from "./cdn-url";
 
-/**
- * Builds a JSDelivr URL for the specified module.
- * @param {string} module - The name of the module.
- * @returns {URL} The JSDelivr URL for the module.
- */
+/** Builds a jsDelivr npm URL. Append /+esm to the specifier for browser ESM. */
 export function buildJSDelivrUrl(module: string): URL | undefined {
   try {
-    const pkg = parsePackage(module);
-    return new URL(pkg.full, "https://cdn.jsdelivr.net/npm/");
+    return createCdnPackageUrl("jsdelivr", module);
   } catch {
     return undefined;
   }

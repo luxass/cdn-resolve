@@ -1,0 +1,21 @@
+ignoreScripts: true
+minimumReleaseAge: 7200
+minimumReleaseAgeStrict: true
+trustPolicy: no-downgrade
+strictDepBuilds: true
+blockExoticSubdeps: true
+catalogMode: prefer
+
+catalogs:
+  dev:
+    oxfmt: 0.79.0
+    oxlint: 1.94.0
+    publint: 0.3.25
+    tsdown: 0.23.7
+    typescript: 7.0.2
+
+  test:
+    vitest: 5.1.0
+
+  types:
+    "@types/node": 24.19.2

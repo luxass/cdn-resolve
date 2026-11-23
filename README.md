@@ -3,101 +3,68 @@
 [![npm version][npm-version-src]][npm-version-href]
 [![npm downloads][npm-downloads-src]][npm-downloads-href]
 
-Resolves packages to their relative CDN URLS.
-
-> [!NOTE]
-> Skypack was recently removed in version v2.0.0, since it wa unmainted and new code was breaking it.
-> So if you are using Skypack, please use version v1.4.1
-
-## Features
-
-- Resolves a package name to a CDN URL
-- Supports all major CDNs (esm.sh, unpkg, jsdelivr, etc.)
-- Resolves types
-
-## 📦 Installation
+Build URLs for npm packages on esm.sh, UNPKG, and jsDelivr. The library supports Node.js 22 and later and has no runtime dependencies.
 
 ```sh
 npm install cdn-resolve
 ```
 
-## 📚 Usage
+## Build a URL
 
-Resolve React from [esm.sh](https://esm.sh)
+Pass a package name, an optional version or tag, and an optional subpath. The builders use `latest` when you omit the version. They return a `URL` or `undefined` if the URL cannot be built.
 
 ```js
-import { buildCDNUrl } from "cdn-resolve";
-
-// You can also import the esm builder directly
-import { buildESMUrl } from "cdn-resolve/esm";
+import { buildCDNUrl, buildJSDelivrUrl, buildUnpkgUrl } from "cdn-resolve";
 
 const esm = buildCDNUrl("esm");
+const react = esm("react@19", { bundle: "no-bundle" });
+// https://esm.sh/react@19?bundle=false
 
-esm("swr", {
-  alias: {
-    react: "preact/compat"
-  }
-});
-// => https://esm.sh/swr?alias=react:preact/compat
+const server = buildUnpkgUrl("react@19", { conditions: ["react-server"] });
+// https://unpkg.com/react@19?conditions=react-server
 
-buildESMUrl("swr", {
-  alias: {
-    react: "preact/compat"
-  }
-});
-
-// => https://esm.sh/swr?alias=react:preact/compat
+const hooks = buildJSDelivrUrl("preact@10.26.4/hooks/+esm");
+// https://cdn.jsdelivr.net/npm/preact@10.26.4/hooks/+esm
 ```
 
-Resolve typedefs for React from [esm.sh](https://esm.sh)
+- [esm.sh](https://github.com/esm-dev/esm.sh#bundling-strategy) transforms packages for ES module imports. `bundle-deps` requests a standalone build, which bundles dependencies other than peer dependencies. `no-bundle` disables bundling.
+- [UNPKG](https://unpkg.com/guides/loading-files) serves published files. Use `conditions` to select package exports or `meta` to list files. `module: true` selects a module entry if the package provides one. It does not transform the file.
+- [jsDelivr](https://www.jsdelivr.com/esm) serves published files by default. Append `/+esm` to a package or subpath for browser-ready ES modules.
+
+## Find type declarations on esm.sh
+
+`resolveESMTypes` reads the `X-TypeScript-Types` header. It returns `null` if the header is absent and rejects if `fetch` fails.
 
 ```js
-import { buildESMUrl } from "cdn-resolve/esm";
+import { buildESMUrl, resolveESMTypes } from "cdn-resolve/esm";
 
-const resolved = buildESMUrl("swr@2.1.1", {
-  alias: {
-    react: "preact/compat"
-  }
-});
-
-const typesUrl = await resolveESMTypes(resolved);
-
-// => https://esm.sh/v135/swr@2.1.1/X-YS9yZWFjdDpwcmVhY3QvY29tcGF0/core/dist/index.d.ts
+const react = buildESMUrl("react@19");
+if (react) {
+  const typesUrl = await resolveESMTypes(react);
+  console.log(typesUrl);
+}
 ```
 
-Parse a Package Name
+## Parse a package specifier
+
+`parsePackage` keeps the leading slash on the subpath. It throws if it cannot parse the input.
 
 ```js
-import { parsePackage } from "cdn-resolve";
+import { parsePackage } from "cdn-resolve/parse";
 
-const parsed = parsePackage("vue");
-
-// => {
-//   "name": "vue",
-//   "version": "latest",
-// }
-
-const parsedWithVersion = parsePackage("vue@3.2.47");
-
-// => {
-//   "name": "vue",
-//   "version": "3.2.47",
-// }
-
-const parsedWithPathAndVersion = parsePackage("vue@3.2.47/package.json");
-
-// => {
-//   "name": "vue",
-//   "version": "3.2.47",
-//   "path": "package.json"
+const parsed = parsePackage("@babel/core/lib/parse.js");
+// {
+//   name: "@babel/core",
+//   version: "latest",
+//   path: "/lib/parse.js",
+//   scope: "babel",
+//   full: "@babel/core@latest/lib/parse.js"
 // }
 ```
 
-## 📄 License
+## License
 
-Published under [MIT License](./LICENSE).
-
-<!-- Badges -->
+[MIT](./LICENSE)
 
 [npm-version-src]: https://img.shields.io/npm/v/cdn-resolve?style=flat&colorA=18181B&colorB=4169E1
 [npm-version-href]: https://npmjs.com/package/cdn-resolve
