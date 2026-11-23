@@ -1,9 +1,15 @@
-import { CDN_BASE_URLS, resolveCdnUrl } from "./cdn-url";
+import type { ECMAScriptTarget } from "./cdn-url";
+import {
+  appendQueryFlag,
+  appendQueryList,
+  CDN_BASE_URLS,
+  formatQueryAliases,
+  resolveCdnUrl,
+} from "./cdn-url";
 import { parsePackage } from "./parse";
 
 type ESMRegistry = "npm" | "jsr" | "github";
-type ECMAScriptYear = 2015 | 2016 | 2017 | 2018 | 2019 | 2020 | 2021 | 2022 | 2023 | 2024;
-type ESMTarget = `es${ECMAScriptYear}` | "esnext" | "deno" | "denonext" | "node";
+type ESMTarget = ECMAScriptTarget | "esnext" | "deno" | "denonext" | "node";
 
 export interface ESMOptions {
   /**
@@ -278,14 +284,6 @@ function formatESMPackagePath(module: string, registry: ESMRegistry = "npm"): st
   return pkg.full;
 }
 
-function appendFlag(params: URLSearchParams, key: string, enabled?: boolean): void {
-  if (enabled) params.append(key, "true");
-}
-
-function appendList(params: URLSearchParams, key: string, values?: string[]): void {
-  if (values) params.append(key, values.join(","));
-}
-
 /**
  * Builds the URL for esm.sh
  *
@@ -303,33 +301,30 @@ export function buildESMUrl(module: string, options?: ESMOptions): URL | undefin
     if (!options) return url;
 
     const params = url.searchParams;
-    appendList(params, "deps", options.deps);
-    if (options.alias) {
-      const aliases = Object.entries(options.alias).map(([from, to]) => `${from}:${to}`);
-      appendList(params, "alias", aliases);
-    }
-    appendList(params, "exports", options.treeShake);
+    appendQueryList(params, "deps", options.deps);
+    appendQueryList(params, "alias", formatQueryAliases(options.alias));
+    appendQueryList(params, "exports", options.treeShake);
 
     if (options.bundle === "bundle-deps") {
       params.append("standalone", "true");
     } else if (options.bundle === "no-bundle") {
       params.append("bundle", "false");
     }
-    appendFlag(params, "dev", options.dev);
+    appendQueryFlag(params, "dev", options.dev);
 
     const { esbuild } = options;
     if (esbuild?.target) params.append("target", esbuild.target);
-    appendList(params, "conditions", esbuild?.conditions);
-    appendFlag(params, "keep-names", esbuild?.keepNames);
-    appendFlag(params, "ignore-annotations", esbuild?.ignoreAnnotations);
+    appendQueryList(params, "conditions", esbuild?.conditions);
+    appendQueryFlag(params, "keep-names", esbuild?.keepNames);
+    appendQueryFlag(params, "ignore-annotations", esbuild?.ignoreAnnotations);
 
-    appendFlag(params, "worker", options.worker);
-    appendFlag(params, "css", options.css);
-    appendFlag(params, "module", options.wasm);
-    if (Array.isArray(options.external)) appendList(params, "external", options.external);
+    appendQueryFlag(params, "worker", options.worker);
+    appendQueryFlag(params, "css", options.css);
+    appendQueryFlag(params, "module", options.wasm);
+    if (Array.isArray(options.external)) appendQueryList(params, "external", options.external);
     if (options.pin) params.append("pin", options.pin);
-    appendFlag(params, "no-dts", options.noDts);
-    appendFlag(params, "raw", options.raw);
+    appendQueryFlag(params, "no-dts", options.noDts);
+    appendQueryFlag(params, "raw", options.raw);
     return url;
   } catch {
     return undefined;

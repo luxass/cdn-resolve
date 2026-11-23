@@ -2,13 +2,13 @@ import { CDN_BASE_URLS } from "./cdn-url";
 import type { ESMOptions } from "./esm";
 import { buildESMUrl, resolveESMTypes } from "./esm";
 import { buildJSDelivrUrl } from "./jsdelivr";
-import type { UnpkgOptions } from "./unpkg";
+import type { UnpkgESMOptions, UnpkgOptions } from "./unpkg";
 import { buildUnpkgUrl } from "./unpkg";
 
 export { buildESMUrl, buildJSDelivrUrl, buildUnpkgUrl, resolveESMTypes };
 export { parsePackage } from "./parse";
 export type { ParsedPackage } from "./parse";
-export type { ESMOptions, UnpkgOptions };
+export type { ESMOptions, UnpkgESMOptions, UnpkgOptions };
 
 /**
  * The base URLs for the supported npm CDNs.

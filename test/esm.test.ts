@@ -106,6 +106,11 @@ describe("buildESMUrl", () => {
     expect(buildESMUrl("react", { bundle: "no-bundle" })?.search).toBe("?bundle=false");
   });
 
+  it("omits empty lists and aliases", () => {
+    const url = buildESMUrl("react", { deps: [], alias: {}, treeShake: [], external: [] });
+    expect(url?.search).toBe("");
+  });
+
   it("omits disabled flags", () => {
     const url = buildESMUrl("react", { dev: false, external: false, noDts: false });
     expect(url?.search).toBe("");

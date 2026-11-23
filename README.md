@@ -45,6 +45,22 @@ buildESMUrl("microsoft/tslib@v2.8.0", { registry: "github" });
 // https://esm.sh/gh/microsoft/tslib@v2.8.0
 ```
 
+## Build browser modules with esm.unpkg.com
+
+[esm.unpkg.com](https://unpkg.com/guides/browser-modules) converts npm packages into ES modules that browsers can load directly. Set `esm` to `true` for the default build, or pass build options. The builder writes the canonical URL that esm.unpkg.com would otherwise redirect to.
+
+```js
+import { buildUnpkgUrl } from "cdn-resolve/unpkg";
+
+buildUnpkgUrl("react@19.2.0", { esm: true });
+// https://esm.unpkg.com/react@19.2.0
+
+buildUnpkgUrl("react-dom@19.2.0/client", {
+  esm: { deps: ["react@19.2.0"], target: "es2020" },
+});
+// https://esm.unpkg.com/react-dom@19.2.0/client?deps=react%4019.2.0&target=es2020
+```
+
 ## Find type declarations on esm.sh
 
 `resolveESMTypes` reads the `X-TypeScript-Types` header. It returns `null` if the header is absent and rejects if `fetch` fails.
