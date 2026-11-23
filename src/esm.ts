@@ -256,7 +256,7 @@ export interface ESMOptions {
   raw?: boolean;
 }
 
-const GITHUB_REPOSITORY_SPECIFIER = /^[^/@]+\/[^/@]+(?:@[^/]+)?(?:\/.*)?$/u;
+const GITHUB_REPOSITORY_SPECIFIER = /^[A-Za-z0-9-]+\/[A-Za-z0-9._-]+(?:@[^/]+)?(?:\/.*)?$/u;
 
 /**
  * Formats the esm.sh path for a package from one of the supported registries.

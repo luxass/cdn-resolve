@@ -31,7 +31,7 @@ export type SupportedCDNS = keyof typeof CDN_URLS;
  * ```
  */
 export function normalizeCdnUrl(cdn: SupportedCDNS, module: string): string {
-  return CDN_URLS[cdn] + "/" + module.replace(/^\//u, "");
+  return CDN_URLS[cdn] + "/" + module.replace(/^\/+/u, "");
 }
 
 type Options<TCDN extends SupportedCDNS> = TCDN extends "esm"
@@ -64,7 +64,7 @@ const cdnBuilders = {
 export function buildCDNUrl<TCDN extends SupportedCDNS>(cdn: TCDN): Builder<TCDN>;
 export function buildCDNUrl(cdn: SupportedCDNS): Builder<SupportedCDNS> {
   if (typeof cdn !== "string" || !Object.hasOwn(cdnBuilders, cdn)) {
-    throw new Error(`Unknown CDN: ${cdn}`);
+    throw new Error(`Unknown CDN: ${String(cdn)}`);
   }
   return cdnBuilders[cdn];
 }

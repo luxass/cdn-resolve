@@ -14,14 +14,52 @@ type ECMAScriptYear = 2015 | 2016 | 2017 | 2018 | 2019 | 2020 | 2021 | 2022 | 20
 /** An ECMAScript output target from `es2015` to `es2024`. */
 export type ECMAScriptTarget = `es${ECMAScriptYear}`;
 
+const DOT_SEGMENT = /^(?:\.|%2e){1,2}$/iu;
+
+function hasControlCharacter(value: string): boolean {
+  for (const character of value) {
+    const code = character.codePointAt(0) ?? 0;
+    if (code < 0x20 || code === 0x7f) return true;
+  }
+  return false;
+}
+
+/**
+ * Reports whether the URL parser could move a path out of its base URL.
+ *
+ * The parser resolves `.` and `..` segments, including the `%2e` forms,
+ * treats a backslash as a slash, and removes tabs and newlines.
+ */
+function canEscapeBaseUrl(path: string): boolean {
+  const [pathname = ""] = path.split(/[?#]/u, 1);
+  return (
+    hasControlCharacter(path) ||
+    pathname.includes("\\") ||
+    pathname.split("/").some((segment) => DOT_SEGMENT.test(segment))
+  );
+}
+
 /**
  * Resolves a path against a CDN base URL.
  *
  * The path is relative, so `resolveCdnUrl("https://esm.sh", "jsr/@std/path")`
  * returns `https://esm.sh/jsr/@std/path`.
+ *
+ * @throws Error if the path could leave the base URL. This includes `.` and
+ * `..` segments, backslashes, control characters, and paths that resolve to
+ * another origin.
  */
 export function resolveCdnUrl(baseUrl: string, path: string): URL {
-  return new URL(path, `${baseUrl}/`);
+  if (canEscapeBaseUrl(path)) {
+    throw new Error(`Invalid CDN path: ${path}`);
+  }
+
+  const base = new URL(`${baseUrl}/`);
+  const url = new URL(path, base);
+  if (url.origin !== base.origin || !url.pathname.startsWith(base.pathname)) {
+    throw new Error(`Invalid CDN path: ${path}`);
+  }
+  return url;
 }
 
 /**

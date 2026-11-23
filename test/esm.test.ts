@@ -41,6 +41,15 @@ describe("buildESMUrl", () => {
       );
     });
 
+    it("accepts GitHub repository names with dots, hyphens, and underscores", () => {
+      expect(
+        buildESMUrl("vercel/next.js@v15.0.0/packages/next", { registry: "github" })?.href,
+      ).toBe("https://esm.sh/gh/vercel/next.js@v15.0.0/packages/next");
+      expect(buildESMUrl("my-org/my_repo@d72d6f7", { registry: "github" })?.href).toBe(
+        "https://esm.sh/gh/my-org/my_repo@d72d6f7",
+      );
+    });
+
     it("puts the external marker before the registry path", () => {
       expect(
         buildESMUrl("@std/encoding@1.0.0/base64", { registry: "jsr", external: true })?.href,
@@ -54,6 +63,10 @@ describe("buildESMUrl", () => {
       expect(buildESMUrl("encoding", { registry: "jsr" })).toBeUndefined();
       expect(buildESMUrl("tslib", { registry: "github" })).toBeUndefined();
       expect(buildESMUrl("@microsoft/tslib", { registry: "github" })).toBeUndefined();
+      expect(buildESMUrl("owner/repo@", { registry: "github" })).toBeUndefined();
+      expect(buildESMUrl("owner//repo", { registry: "github" })).toBeUndefined();
+      expect(buildESMUrl("own:er/repo", { registry: "github" })).toBeUndefined();
+      expect(buildESMUrl("owner/re po", { registry: "github" })).toBeUndefined();
       expect(buildESMUrl("react", { registry: "deno" as never })).toBeUndefined();
     });
   });

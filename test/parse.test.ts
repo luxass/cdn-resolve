@@ -97,3 +97,17 @@ describe("packages without scopes", () => {
 it("throw error when package name is invalid", () => {
   expect(() => parsePackage("@babel")).toThrowError("Invalid package name: @babel");
 });
+
+it.each([
+  "react?dev",
+  "react#top",
+  "javascript:alert(1)",
+  "http:evil.example",
+  "re act",
+  "re%61ct",
+  "@sc ope/name",
+  "@scope/na:me",
+  "@sc@ope/name",
+])("rejects the name %j because npm requires URL-safe names", (specifier) => {
+  expect(() => parsePackage(specifier)).toThrowError(`Invalid package name: ${specifier}`);
+});
