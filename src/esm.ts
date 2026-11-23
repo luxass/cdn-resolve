@@ -1,9 +1,39 @@
-import { createCdnPackageUrl } from "./cdn-url";
+import type { ECMAScriptTarget } from "./cdn-url";
+import {
+  appendQueryFlag,
+  appendQueryList,
+  CDN_BASE_URLS,
+  formatQueryAliases,
+  resolveCdnUrl,
+} from "./cdn-url";
+import { parsePackage } from "./parse";
 
-type ECMAScriptYear = 2015 | 2016 | 2017 | 2018 | 2019 | 2020 | 2021 | 2022 | 2023 | 2024;
-type ESMTarget = `es${ECMAScriptYear}` | "esnext" | "deno" | "denonext" | "node";
+type ESMRegistry = "npm" | "jsr" | "github";
+type ESMTarget = ECMAScriptTarget | "esnext" | "deno" | "denonext" | "node";
 
 export interface ESMOptions {
+  /**
+   * The registry that esm.sh loads the package from. Defaults to `npm`.
+   *
+   * With `jsr`, pass a scoped JSR package. The builder adds `latest` when you
+   * omit the version, the same as for npm:
+   *
+   * ```ts
+   * buildESMUrl("@std/encoding@1.0.0/base64", { registry: "jsr" });
+   * // => https://esm.sh/jsr/@std/encoding@1.0.0/base64
+   * ```
+   *
+   * With `github`, pass `owner/repo`, an optional tag, branch, or commit, and an
+   * optional path. Without a reference, esm.sh uses the default branch. esm.sh
+   * also transforms `.ts`, `.tsx`, `.vue`, and `.svelte` files from GitHub:
+   *
+   * ```ts
+   * buildESMUrl("microsoft/tslib@v2.8.0", { registry: "github" });
+   * // => https://esm.sh/gh/microsoft/tslib@v2.8.0
+   * ```
+   */
+  registry?: ESMRegistry;
+
   /**
    * By default, esm.sh rewrites import specifiers based on the package dependencies.
    * To specify the version of these dependencies, you can add the
@@ -174,6 +204,9 @@ export interface ESMOptions {
    * import useSWR from "https://esm.sh/swr?external=react";
    * ```
    *
+   * Use `preact/*` to keep only the subpath imports, such as `preact/hooks`, as
+   * bare imports. Use `preact` to keep both the package and its subpaths.
+   *
    * Alternatively, you can mark all dependencies as external by adding a `*`
    * before the package name
    * ```ts
@@ -223,12 +256,32 @@ export interface ESMOptions {
   raw?: boolean;
 }
 
-function appendFlag(params: URLSearchParams, key: string, enabled?: boolean): void {
-  if (enabled) params.append(key, "true");
-}
+const GITHUB_REPOSITORY_SPECIFIER = /^[A-Za-z0-9-]+\/[A-Za-z0-9._-]+(?:@[^/]+)?(?:\/.*)?$/u;
 
-function appendList(params: URLSearchParams, key: string, values?: string[]): void {
-  if (values) params.append(key, values.join(","));
+/**
+ * Formats the esm.sh path for a package from one of the supported registries.
+ *
+ * @throws Error if the module is not valid for the registry.
+ */
+function formatESMPackagePath(module: string, registry: ESMRegistry = "npm"): string {
+  if (registry === "github") {
+    if (!GITHUB_REPOSITORY_SPECIFIER.test(module)) {
+      throw new Error(`Invalid GitHub repository: ${module}`);
+    }
+    return `gh/${module}`;
+  }
+
+  const pkg = parsePackage(module);
+  if (registry === "jsr") {
+    if (!pkg.scope) {
+      throw new Error(`Invalid JSR package name: ${module}`);
+    }
+    return `jsr/${pkg.full}`;
+  }
+  if (registry !== "npm") {
+    throw new Error(`Unknown esm.sh registry: ${String(registry)}`);
+  }
+  return pkg.full;
 }
 
 /**
@@ -240,37 +293,38 @@ function appendList(params: URLSearchParams, key: string, values?: string[]): vo
  */
 export function buildESMUrl(module: string, options?: ESMOptions): URL | undefined {
   try {
-    const url = createCdnPackageUrl("esm", module, options?.external === true ? "*" : "");
+    const external = options?.external === true ? "*" : "";
+    const url = resolveCdnUrl(
+      CDN_BASE_URLS.esm,
+      external + formatESMPackagePath(module, options?.registry),
+    );
     if (!options) return url;
 
     const params = url.searchParams;
-    appendList(params, "deps", options.deps);
-    if (options.alias) {
-      const aliases = Object.entries(options.alias).map(([from, to]) => `${from}:${to}`);
-      appendList(params, "alias", aliases);
-    }
-    appendList(params, "exports", options.treeShake);
+    appendQueryList(params, "deps", options.deps);
+    appendQueryList(params, "alias", formatQueryAliases(options.alias));
+    appendQueryList(params, "exports", options.treeShake);
 
     if (options.bundle === "bundle-deps") {
       params.append("standalone", "true");
     } else if (options.bundle === "no-bundle") {
       params.append("bundle", "false");
     }
-    appendFlag(params, "dev", options.dev);
+    appendQueryFlag(params, "dev", options.dev);
 
     const { esbuild } = options;
     if (esbuild?.target) params.append("target", esbuild.target);
-    appendList(params, "conditions", esbuild?.conditions);
-    appendFlag(params, "keep-names", esbuild?.keepNames);
-    appendFlag(params, "ignore-annotations", esbuild?.ignoreAnnotations);
+    appendQueryList(params, "conditions", esbuild?.conditions);
+    appendQueryFlag(params, "keep-names", esbuild?.keepNames);
+    appendQueryFlag(params, "ignore-annotations", esbuild?.ignoreAnnotations);
 
-    appendFlag(params, "worker", options.worker);
-    appendFlag(params, "css", options.css);
-    appendFlag(params, "module", options.wasm);
-    if (Array.isArray(options.external)) appendList(params, "external", options.external);
+    appendQueryFlag(params, "worker", options.worker);
+    appendQueryFlag(params, "css", options.css);
+    appendQueryFlag(params, "module", options.wasm);
+    if (Array.isArray(options.external)) appendQueryList(params, "external", options.external);
     if (options.pin) params.append("pin", options.pin);
-    appendFlag(params, "no-dts", options.noDts);
-    appendFlag(params, "raw", options.raw);
+    appendQueryFlag(params, "no-dts", options.noDts);
+    appendQueryFlag(params, "raw", options.raw);
     return url;
   } catch {
     return undefined;

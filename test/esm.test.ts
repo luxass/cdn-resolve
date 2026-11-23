@@ -12,6 +12,65 @@ describe("buildESMUrl", () => {
     expect(url?.href).toBe("https://esm.sh/*@scope/pkg@1.2.3/subpath");
   });
 
+  describe("registries", () => {
+    it("treats npm as the default registry", () => {
+      expect(buildESMUrl("react@19", { registry: "npm" })?.href).toBe(
+        buildESMUrl("react@19")?.href,
+      );
+    });
+
+    it("builds JSR URLs and adds latest when the version is omitted", () => {
+      expect(buildESMUrl("@std/encoding@1.0.0/base64", { registry: "jsr" })?.href).toBe(
+        "https://esm.sh/jsr/@std/encoding@1.0.0/base64",
+      );
+      expect(buildESMUrl("@hono/hono", { registry: "jsr" })?.href).toBe(
+        "https://esm.sh/jsr/@hono/hono@latest",
+      );
+    });
+
+    it("builds GitHub URLs without adding a reference", () => {
+      expect(buildESMUrl("microsoft/tslib", { registry: "github" })?.href).toBe(
+        "https://esm.sh/gh/microsoft/tslib",
+      );
+      const url = buildESMUrl("phosphor-icons/react@v2.1.5/src/csr/Airplay.tsx", {
+        registry: "github",
+        deps: ["react@19.2.4"],
+      });
+      expect(url?.href).toBe(
+        "https://esm.sh/gh/phosphor-icons/react@v2.1.5/src/csr/Airplay.tsx?deps=react%4019.2.4",
+      );
+    });
+
+    it("accepts GitHub repository names with dots, hyphens, and underscores", () => {
+      expect(
+        buildESMUrl("vercel/next.js@v15.0.0/packages/next", { registry: "github" })?.href,
+      ).toBe("https://esm.sh/gh/vercel/next.js@v15.0.0/packages/next");
+      expect(buildESMUrl("my-org/my_repo@d72d6f7", { registry: "github" })?.href).toBe(
+        "https://esm.sh/gh/my-org/my_repo@d72d6f7",
+      );
+    });
+
+    it("puts the external marker before the registry path", () => {
+      expect(
+        buildESMUrl("@std/encoding@1.0.0/base64", { registry: "jsr", external: true })?.href,
+      ).toBe("https://esm.sh/*jsr/@std/encoding@1.0.0/base64");
+      expect(
+        buildESMUrl("microsoft/tslib@v2.8.0", { registry: "github", external: true })?.href,
+      ).toBe("https://esm.sh/*gh/microsoft/tslib@v2.8.0");
+    });
+
+    it("returns undefined for modules that the registry cannot load", () => {
+      expect(buildESMUrl("encoding", { registry: "jsr" })).toBeUndefined();
+      expect(buildESMUrl("tslib", { registry: "github" })).toBeUndefined();
+      expect(buildESMUrl("@microsoft/tslib", { registry: "github" })).toBeUndefined();
+      expect(buildESMUrl("owner/repo@", { registry: "github" })).toBeUndefined();
+      expect(buildESMUrl("owner//repo", { registry: "github" })).toBeUndefined();
+      expect(buildESMUrl("own:er/repo", { registry: "github" })).toBeUndefined();
+      expect(buildESMUrl("owner/re po", { registry: "github" })).toBeUndefined();
+      expect(buildESMUrl("react", { registry: "deno" as never })).toBeUndefined();
+    });
+  });
+
   it("encodes build options as documented by esm.sh", () => {
     const url = buildESMUrl("react", {
       deps: ["react-dom@18", "preact@10"],
@@ -52,12 +111,43 @@ describe("buildESMUrl", () => {
     ]);
   });
 
+  it("percent-encodes version ranges and non-ASCII paths", () => {
+    const url = buildESMUrl("react@>=18 <19/ファイル.js");
+    expect(url?.pathname).toBe("/react@%3E=18%20%3C19/%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB.js");
+    expect(decodeURIComponent(url!.pathname)).toBe("/react@>=18 <19/ファイル.js");
+    expect(buildESMUrl("@std/encoding@^1.0.0/base64", { registry: "jsr" })?.href).toBe(
+      "https://esm.sh/jsr/@std/encoding@%5E1.0.0/base64",
+    );
+  });
+
+  it("keeps subpath externals such as preact/*", () => {
+    const url = buildESMUrl("preact-render-to-string@6", { external: ["preact/*"] });
+    expect(url?.href).toBe("https://esm.sh/preact-render-to-string@6?external=preact%2F*");
+    expect(url?.searchParams.get("external")).toBe("preact/*");
+  });
+
+  it("joins several aliases in insertion order", () => {
+    const url = buildESMUrl("swr", {
+      alias: { react: "preact/compat", "react-dom": "preact/compat" },
+    });
+    expect(url?.searchParams.get("alias")).toBe("react:preact/compat,react-dom:preact/compat");
+  });
+
+  it("adds no parameters for empty esbuild options or an unknown bundle value", () => {
+    expect(buildESMUrl("react", { esbuild: {}, bundle: "everything" as never })?.search).toBe("");
+  });
+
   it("requests the standalone build for bundle-deps", () => {
     expect(buildESMUrl("react", { bundle: "bundle-deps" })?.search).toBe("?standalone=true");
   });
 
   it("disables bundling for no-bundle", () => {
     expect(buildESMUrl("react", { bundle: "no-bundle" })?.search).toBe("?bundle=false");
+  });
+
+  it("omits empty lists and aliases", () => {
+    const url = buildESMUrl("react", { deps: [], alias: {}, treeShake: [], external: [] });
+    expect(url?.search).toBe("");
   });
 
   it("omits disabled flags", () => {
@@ -86,6 +176,18 @@ describe("resolveESMTypes", () => {
       expect(fetch).toHaveBeenCalledWith(packageUrl);
     },
   );
+
+  it("passes a URL string with its query to fetch unchanged", async () => {
+    const fetch = vi.fn().mockResolvedValue(
+      new Response(null, {
+        headers: { "x-typescript-types": typesUrl },
+      }),
+    );
+    vi.stubGlobal("fetch", fetch);
+
+    await expect(resolveESMTypes(`${packageUrl}?target=es2022`)).resolves.toBe(typesUrl);
+    expect(fetch).toHaveBeenCalledWith(`${packageUrl}?target=es2022`);
+  });
 
   it("returns null when the header is absent, even on a failed HTTP response", async () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(null, { status: 404 })));
