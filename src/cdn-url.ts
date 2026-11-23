@@ -7,6 +7,16 @@ export const CDN_BASE_URLS = {
 } as const;
 
 /**
+ * Resolves a path against a CDN base URL.
+ *
+ * The path is relative, so `resolveCdnUrl("https://esm.sh", "jsr/@std/path")`
+ * returns `https://esm.sh/jsr/@std/path`.
+ */
+export function resolveCdnUrl(baseUrl: string, path: string): URL {
+  return new URL(path, `${baseUrl}/`);
+}
+
+/**
  * Builds a CDN URL from a package specifier.
  *
  * The specifier always gets an explicit version, so `react` becomes
@@ -21,5 +31,5 @@ export function createCdnPackageUrl(
   prefix = "",
 ): URL {
   const { full } = parsePackage(specifier);
-  return new URL(prefix + full, CDN_BASE_URLS[cdn] + "/");
+  return resolveCdnUrl(CDN_BASE_URLS[cdn], prefix + full);
 }

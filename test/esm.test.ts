@@ -12,6 +12,52 @@ describe("buildESMUrl", () => {
     expect(url?.href).toBe("https://esm.sh/*@scope/pkg@1.2.3/subpath");
   });
 
+  describe("registries", () => {
+    it("treats npm as the default registry", () => {
+      expect(buildESMUrl("react@19", { registry: "npm" })?.href).toBe(
+        buildESMUrl("react@19")?.href,
+      );
+    });
+
+    it("builds JSR URLs and adds latest when the version is omitted", () => {
+      expect(buildESMUrl("@std/encoding@1.0.0/base64", { registry: "jsr" })?.href).toBe(
+        "https://esm.sh/jsr/@std/encoding@1.0.0/base64",
+      );
+      expect(buildESMUrl("@hono/hono", { registry: "jsr" })?.href).toBe(
+        "https://esm.sh/jsr/@hono/hono@latest",
+      );
+    });
+
+    it("builds GitHub URLs without adding a reference", () => {
+      expect(buildESMUrl("microsoft/tslib", { registry: "github" })?.href).toBe(
+        "https://esm.sh/gh/microsoft/tslib",
+      );
+      const url = buildESMUrl("phosphor-icons/react@v2.1.5/src/csr/Airplay.tsx", {
+        registry: "github",
+        deps: ["react@19.2.4"],
+      });
+      expect(url?.href).toBe(
+        "https://esm.sh/gh/phosphor-icons/react@v2.1.5/src/csr/Airplay.tsx?deps=react%4019.2.4",
+      );
+    });
+
+    it("puts the external marker before the registry path", () => {
+      expect(
+        buildESMUrl("@std/encoding@1.0.0/base64", { registry: "jsr", external: true })?.href,
+      ).toBe("https://esm.sh/*jsr/@std/encoding@1.0.0/base64");
+      expect(
+        buildESMUrl("microsoft/tslib@v2.8.0", { registry: "github", external: true })?.href,
+      ).toBe("https://esm.sh/*gh/microsoft/tslib@v2.8.0");
+    });
+
+    it("returns undefined for modules that the registry cannot load", () => {
+      expect(buildESMUrl("encoding", { registry: "jsr" })).toBeUndefined();
+      expect(buildESMUrl("tslib", { registry: "github" })).toBeUndefined();
+      expect(buildESMUrl("@microsoft/tslib", { registry: "github" })).toBeUndefined();
+      expect(buildESMUrl("react", { registry: "deno" as never })).toBeUndefined();
+    });
+  });
+
   it("encodes build options as documented by esm.sh", () => {
     const url = buildESMUrl("react", {
       deps: ["react-dom@18", "preact@10"],

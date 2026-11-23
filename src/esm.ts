@@ -1,9 +1,33 @@
-import { createCdnPackageUrl } from "./cdn-url";
+import { CDN_BASE_URLS, resolveCdnUrl } from "./cdn-url";
+import { parsePackage } from "./parse";
 
+type ESMRegistry = "npm" | "jsr" | "github";
 type ECMAScriptYear = 2015 | 2016 | 2017 | 2018 | 2019 | 2020 | 2021 | 2022 | 2023 | 2024;
 type ESMTarget = `es${ECMAScriptYear}` | "esnext" | "deno" | "denonext" | "node";
 
 export interface ESMOptions {
+  /**
+   * The registry that esm.sh loads the package from. Defaults to `npm`.
+   *
+   * With `jsr`, pass a scoped JSR package. The builder adds `latest` when you
+   * omit the version, the same as for npm:
+   *
+   * ```ts
+   * buildESMUrl("@std/encoding@1.0.0/base64", { registry: "jsr" });
+   * // => https://esm.sh/jsr/@std/encoding@1.0.0/base64
+   * ```
+   *
+   * With `github`, pass `owner/repo`, an optional tag, branch, or commit, and an
+   * optional path. Without a reference, esm.sh uses the default branch. esm.sh
+   * also transforms `.ts`, `.tsx`, `.vue`, and `.svelte` files from GitHub:
+   *
+   * ```ts
+   * buildESMUrl("microsoft/tslib@v2.8.0", { registry: "github" });
+   * // => https://esm.sh/gh/microsoft/tslib@v2.8.0
+   * ```
+   */
+  registry?: ESMRegistry;
+
   /**
    * By default, esm.sh rewrites import specifiers based on the package dependencies.
    * To specify the version of these dependencies, you can add the
@@ -174,6 +198,9 @@ export interface ESMOptions {
    * import useSWR from "https://esm.sh/swr?external=react";
    * ```
    *
+   * Use `preact/*` to keep only the subpath imports, such as `preact/hooks`, as
+   * bare imports. Use `preact` to keep both the package and its subpaths.
+   *
    * Alternatively, you can mark all dependencies as external by adding a `*`
    * before the package name
    * ```ts
@@ -223,6 +250,34 @@ export interface ESMOptions {
   raw?: boolean;
 }
 
+const GITHUB_REPOSITORY_SPECIFIER = /^[^/@]+\/[^/@]+(?:@[^/]+)?(?:\/.*)?$/u;
+
+/**
+ * Formats the esm.sh path for a package from one of the supported registries.
+ *
+ * @throws Error if the module is not valid for the registry.
+ */
+function formatESMPackagePath(module: string, registry: ESMRegistry = "npm"): string {
+  if (registry === "github") {
+    if (!GITHUB_REPOSITORY_SPECIFIER.test(module)) {
+      throw new Error(`Invalid GitHub repository: ${module}`);
+    }
+    return `gh/${module}`;
+  }
+
+  const pkg = parsePackage(module);
+  if (registry === "jsr") {
+    if (!pkg.scope) {
+      throw new Error(`Invalid JSR package name: ${module}`);
+    }
+    return `jsr/${pkg.full}`;
+  }
+  if (registry !== "npm") {
+    throw new Error(`Unknown esm.sh registry: ${String(registry)}`);
+  }
+  return pkg.full;
+}
+
 function appendFlag(params: URLSearchParams, key: string, enabled?: boolean): void {
   if (enabled) params.append(key, "true");
 }
@@ -240,7 +295,11 @@ function appendList(params: URLSearchParams, key: string, values?: string[]): vo
  */
 export function buildESMUrl(module: string, options?: ESMOptions): URL | undefined {
   try {
-    const url = createCdnPackageUrl("esm", module, options?.external === true ? "*" : "");
+    const external = options?.external === true ? "*" : "";
+    const url = resolveCdnUrl(
+      CDN_BASE_URLS.esm,
+      external + formatESMPackagePath(module, options?.registry),
+    );
     if (!options) return url;
 
     const params = url.searchParams;

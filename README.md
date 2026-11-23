@@ -31,6 +31,20 @@ const hooks = buildJSDelivrUrl("preact@10.26.4/hooks/+esm");
 - [UNPKG](https://unpkg.com/guides/loading-files) serves published files. Use `conditions` to select package exports or `meta` to list files. `module: true` selects a module entry if the package provides one. It does not transform the file.
 - [jsDelivr](https://www.jsdelivr.com/esm) serves published files by default. Append `/+esm` to a package or subpath for browser-ready ES modules.
 
+## Load JSR and GitHub packages from esm.sh
+
+[esm.sh](https://github.com/esm-dev/esm.sh#supported-registries) also serves packages from JSR and GitHub. Set `registry` to `jsr` for a scoped JSR package, or to `github` for `owner/repo`. Without a tag, branch, or commit, esm.sh uses the repository's default branch.
+
+```js
+import { buildESMUrl } from "cdn-resolve/esm";
+
+buildESMUrl("@std/encoding@1.0.0/base64", { registry: "jsr" });
+// https://esm.sh/jsr/@std/encoding@1.0.0/base64
+
+buildESMUrl("microsoft/tslib@v2.8.0", { registry: "github" });
+// https://esm.sh/gh/microsoft/tslib@v2.8.0
+```
+
 ## Find type declarations on esm.sh
 
 `resolveESMTypes` reads the `X-TypeScript-Types` header. It returns `null` if the header is absent and rejects if `fetch` fails.
