@@ -41,7 +41,42 @@ it("selects package export conditions separately from the module query", () => {
   expect(url?.searchParams.has("module")).toBe(false);
 });
 
+it("combines the unpkg.com options in a fixed order", () => {
+  const url = buildUnpkgUrl("react@19", { meta: true, module: true, conditions: ["react-server"] });
+  expect(url?.href).toBe(
+    "https://unpkg.com/react@19?meta=true&module=true&conditions=react-server",
+  );
+});
+
+it("adds no parameter for empty conditions on unpkg.com", () => {
+  expect(buildUnpkgUrl("react", { conditions: [] })?.search).toBe("");
+});
+
 describe("esm.unpkg.com", () => {
+  it("encodes scoped dependencies and keeps scoped subpaths", () => {
+    const url = buildUnpkgUrl("@preact/signals@2.0.0/dist/signals.mjs", {
+      esm: { deps: ["@preact/signals-core@1.8.0"] },
+    });
+    expect(url?.href).toBe(
+      "https://esm.unpkg.com/@preact/signals@2.0.0/dist/signals.mjs?deps=%40preact%2Fsignals-core%401.8.0",
+    );
+  });
+
+  it("adds nothing for empty lists, empty aliases, and disabled flags", () => {
+    const url = buildUnpkgUrl("react@19.2.0", {
+      conditions: [],
+      meta: false,
+      esm: { deps: [], alias: {}, external: false, dev: false, min: false },
+    });
+    expect(url?.href).toBe("https://esm.unpkg.com/react@19.2.0");
+  });
+
+  it("sends top-level conditions to esm.unpkg.com", () => {
+    expect(buildUnpkgUrl("react@19.2.0", { conditions: ["react-server"], esm: true })?.href).toBe(
+      "https://esm.unpkg.com/react@19.2.0?conditions=react-server",
+    );
+  });
+
   it("builds a browser module URL with the default build", () => {
     expect(buildUnpkgUrl("react@19.2.0", { esm: true })?.href).toBe(
       "https://esm.unpkg.com/react@19.2.0",

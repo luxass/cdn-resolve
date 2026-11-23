@@ -32,6 +32,12 @@ it("adds /+esm with the esm option", () => {
   );
 });
 
+it("adds /+esm after a file path", () => {
+  expect(buildJSDelivrUrl("preact@10.26.4/dist/preact.mjs", { esm: true })?.href).toBe(
+    "https://cdn.jsdelivr.net/npm/preact@10.26.4/dist/preact.mjs/+esm",
+  );
+});
+
 it("does not add /+esm twice", () => {
   expect(buildJSDelivrUrl("preact@10.26.4/hooks/+esm", { esm: true })?.href).toBe(
     "https://cdn.jsdelivr.net/npm/preact@10.26.4/hooks/+esm",

@@ -98,6 +98,58 @@ it("throw error when package name is invalid", () => {
   expect(() => parsePackage("@babel")).toThrowError("Invalid package name: @babel");
 });
 
+describe("edge cases", () => {
+  it.each([
+    ["react@next", "next"],
+    ["react@^18.2.0", "^18.2.0"],
+    ["react@~18.2", "~18.2"],
+    ["react@>=18 <19", ">=18 <19"],
+    ["react@18.3.1-canary.0+build.5", "18.3.1-canary.0+build.5"],
+  ])("keeps the version in %j", (specifier, version) => {
+    expect(parsePackage(specifier)).toMatchObject({ name: "react", version });
+  });
+
+  it("keeps a trailing slash as the path", () => {
+    expect(parsePackage("react@18/")).toEqual({
+      name: "react",
+      version: "18",
+      path: "/",
+      full: "react@18/",
+    });
+  });
+
+  it("keeps @ inside the subpath", () => {
+    expect(parsePackage("pkg@1/@scope/file.js")).toMatchObject({
+      name: "pkg",
+      version: "1",
+      path: "/@scope/file.js",
+    });
+  });
+
+  it("allows uppercase letters and npm's other URL-safe characters in names", () => {
+    expect(parsePackage("JSONStream@1").name).toBe("JSONStream");
+    expect(parsePackage("@Org/x.y_z-1~!*'()").name).toBe("@Org/x.y_z-1~!*'()");
+  });
+
+  it.each(["", "@", "@scope", "@scope/", "@/name", "/react", "react@", "@scope/name@", "react@/x"])(
+    "throws for the incomplete specifier %j",
+    (specifier) => {
+      expect(() => parsePackage(specifier)).toThrowError(`Invalid package name: ${specifier}`);
+    },
+  );
+
+  it.each([
+    "react",
+    "react@18/index.js",
+    "@babel/core",
+    "@babel/core@7.21.3/lib/parse.js",
+    "react@>=18 <19/index.js",
+  ])("parses its own full specifier to the same package: %j", (specifier) => {
+    const parsed = parsePackage(specifier);
+    expect(parsePackage(parsed.full)).toEqual(parsed);
+  });
+});
+
 it.each([
   "react?dev",
   "react#top",

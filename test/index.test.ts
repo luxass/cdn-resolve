@@ -5,6 +5,7 @@ import {
   buildESMUrl,
   buildJSDelivrUrl,
   buildUnpkgUrl,
+  CDN_URLS,
   normalizeCdnUrl,
   parsePackage,
 } from "../src";
@@ -13,6 +14,23 @@ it("resolve cdn from string", () => {
   expect(buildCDNUrl("esm")).toBe(buildESMUrl);
   expect(buildCDNUrl("unpkg")).toBe(buildUnpkgUrl);
   expect(buildCDNUrl("jsdelivr")).toBe(buildJSDelivrUrl);
+});
+
+it("exposes the base URL for each CDN", () => {
+  expect(CDN_URLS).toEqual({
+    esm: "https://esm.sh",
+    unpkg: "https://unpkg.com",
+    jsdelivr: "https://cdn.jsdelivr.net/npm",
+  });
+});
+
+it("passes options through every builder", () => {
+  expect(buildCDNUrl("esm")("react@19", { dev: true })?.href).toBe(
+    "https://esm.sh/react@19?dev=true",
+  );
+  expect(buildCDNUrl("unpkg")("react@19", { esm: true })?.href).toBe(
+    "https://esm.unpkg.com/react@19",
+  );
 });
 
 it("passes options through the jsDelivr builder", () => {
