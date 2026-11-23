@@ -128,6 +128,10 @@ export interface UnpkgOptions {
    * ```
    *
    * The builder ignores this option for esm.unpkg.com.
+   *
+   * @deprecated UNPKG no longer documents the `?module` query, so it can stop
+   * working without notice. Use `esm` for a browser-ready ES module, or
+   * `conditions` to select an export condition.
    */
   module?: boolean;
 

@@ -28,7 +28,7 @@ const hooks = buildJSDelivrUrl("preact@10.26.4/hooks", { esm: true });
 ```
 
 - [esm.sh](https://github.com/esm-dev/esm.sh#bundling-strategy) transforms packages for ES module imports. `bundle-deps` requests a standalone build, which bundles dependencies other than peer dependencies. `no-bundle` disables bundling.
-- [UNPKG](https://unpkg.com/guides/loading-files) serves published files. Use `conditions` to select package exports or `meta` to list files. `module: true` selects a module entry if the package provides one. It does not transform the file.
+- [UNPKG](https://unpkg.com/guides/loading-files) serves published files. Use `conditions` to select package exports or `meta` to list files. Set `esm` to build browser-ready ES modules on esm.unpkg.com. The `module` option is deprecated because UNPKG no longer documents it.
 - [jsDelivr](https://www.jsdelivr.com/esm) serves published files by default. Set `esm: true` to add `/+esm` for a browser-ready ES module of the package or subpath.
 
 ## Load JSR and GitHub packages from esm.sh
