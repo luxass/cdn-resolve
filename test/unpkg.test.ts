@@ -32,3 +32,11 @@ it("resolve react with module", () => {
   expect(resolved?.host).toBe("unpkg.com");
   expect(resolved?.searchParams.get("module")).toBe("true");
 });
+
+it("selects package export conditions separately from the module query", () => {
+  const url = buildUnpkgUrl("react@19", {
+    conditions: ["react-server", "development"],
+  });
+  expect(url?.searchParams.get("conditions")).toBe("react-server,development");
+  expect(url?.searchParams.has("module")).toBe(false);
+});

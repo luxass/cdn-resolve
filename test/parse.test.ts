@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { parsePackage } from "../src/parse";
 
 describe("packages with scopes", () => {
@@ -94,7 +95,5 @@ describe("packages without scopes", () => {
 });
 
 it("throw error when package name is invalid", () => {
-  expect(() => parsePackage("@babel")).toThrowError(
-    "Invalid package name: @babel",
-  );
+  expect(() => parsePackage("@babel")).toThrowError("Invalid package name: @babel");
 });

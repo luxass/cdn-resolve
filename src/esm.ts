@@ -1,4 +1,7 @@
-import { parsePackage } from "./parse";
+import { createCdnPackageUrl } from "./cdn-url";
+
+type ECMAScriptYear = 2015 | 2016 | 2017 | 2018 | 2019 | 2020 | 2021 | 2022 | 2023 | 2024;
+type ESMTarget = `es${ECMAScriptYear}` | "esnext" | "deno" | "denonext" | "node";
 
 export interface ESMOptions {
   /**
@@ -6,7 +9,6 @@ export interface ESMOptions {
    * To specify the version of these dependencies, you can add the
    * `?deps=PACKAGE@VERSION` query. To specify multiple dependencies, separate them
    * with a comma, like this: `?deps=react@17.0.2,react-dom@17.0.2`.
-   *
    *
    * ```ts
    * import React from "https://esm.sh/react@17.0.2";
@@ -17,7 +19,6 @@ export interface ESMOptions {
 
   /**
    * A list of modules to alias to other modules
-   *
    *
    * ```ts
    * import useSWR from "https://esm.sh/swr?alias=react:preact/compat";
@@ -30,11 +31,9 @@ export interface ESMOptions {
   alias?: Record<string, string>;
 
   /**
-   *
    * By default, esm.sh exports a module with all its exported members. However, if
    * you want to import only a specific set of members, you can specify them by
    * adding a `?exports=foo,bar` query to the import statement.
-   *
    *
    * ```ts
    * import { __await, __rest } from "https://esm.sh/tslib"; // 7.3KB
@@ -44,22 +43,23 @@ export interface ESMOptions {
   treeShake?: string[];
 
   /**
-   * By default, esm.sh bundles sub-modules that ain't declared in the `exports` field.
+   * By default, esm.sh bundles sub-modules that are not declared in the `exports` field.
    *
-   * You can also bundle all dependencies of a package into a single JS file by
-   * adding `?bundle-deps` query to the import URL:
+   * Use `bundle-deps` to bundle all dependencies of a package, except peer
+   * dependencies, into a single JS file. The builder adds the `?standalone` query:
    *
    * ```ts
-   * import { Button } from "https://esm.sh/antd?bundle-deps";
+   * import { Button } from "https://esm.sh/antd?standalone=true";
    * ```
    *
    * Bundling deps can reduce the number of network requests and improve performance.
-   * However, it may bundle shared code repeatedly. In extreme case, it may break the
+   * However, it may bundle shared code repeatedly. In extreme cases, it may break the
    * side effects of the package, or change the `import.meta.url` pointing. To avoid
-   * this, you can add `?no-bundle` to disable the default bundling behavior:
+   * this, use `no-bundle` to disable the default bundling behavior. The builder adds
+   * the `?bundle=false` query:
    *
    * ```ts
-   * import "https://esm.sh/@pyscript/core?no-bundle";
+   * import "https://esm.sh/@pyscript/core?bundle=false";
    * ```
    */
   bundle?: "bundle-deps" | "no-bundle";
@@ -82,13 +82,15 @@ export interface ESMOptions {
    */
   esbuild?: {
     /**
-     * The target environment for the generated code
+     * The target environment for the generated code. esm.sh supports every
+     * ECMAScript year from `es2015` to `es2024`, plus `esnext`, `deno`,
+     * `denonext`, and `node`.
      *
      * ```ts
      * import React from "https://esm.sh/react?target=es2020";
      * ```
      */
-    target?: "es2015" | "es2022" | "esnext" | "deno" | "denonext" | "node";
+    target?: ESMTarget;
 
     /**
      * Use custom conditions for the build
@@ -181,32 +183,21 @@ export interface ESMOptions {
   external?: string[] | boolean;
 
   /**
-   * To ensure stable and consistent behavior, you may want to pin the build version
-   * of a module you're using from esm.sh. This helps you avoid potential breaking
-   * changes in the module caused by updates to the esm.sh server.
-   *
-   * The `?pin` query allows you to specify a specific build version of a module,
-   * which is an **immutable** cached version stored on the esm.sh CDN.
+   * Requests a legacy esm.sh build version with the `?pin` query.
    *
    * ```ts
    * import React from "https://esm.sh/react-dom?pin=v135";
-   * // or use version prefix
-   * import React from "https://esm.sh/v135/react-dom";
    * ```
    *
-   * By using the `?pin` query in the import statement, you can rest assured that the
-   * version of the module you're using will not change, even if updates are pushed
-   * to the esm.sh server. This helps ensure the stability and reliability of your
-   * application.
-   *
-   * For UI libraries like _React_ and _Vue_, esm.sh uses a special build version
-   * `stable` to ensure single version of the library is used in the whole
-   * application.
+   * esm.sh only serves `?pin` for older build versions, and it does not guarantee
+   * an immutable build. To keep a module stable, pin an exact package version,
+   * such as `react-dom@18.3.1`, instead.
    */
   pin?: string;
 
   /**
-   * Removes the x-typescript-types header when requesting url
+   * Removes the `X-TypeScript-Types` header from the response with the
+   * `?no-dts` query. esm.sh still builds the module.
    */
   noDts?: boolean;
 
@@ -232,6 +223,14 @@ export interface ESMOptions {
   raw?: boolean;
 }
 
+function appendFlag(params: URLSearchParams, key: string, enabled?: boolean): void {
+  if (enabled) params.append(key, "true");
+}
+
+function appendList(params: URLSearchParams, key: string, values?: string[]): void {
+  if (values) params.append(key, values.join(","));
+}
+
 /**
  * Builds the URL for esm.sh
  *
@@ -239,92 +238,39 @@ export interface ESMOptions {
  * @param {ESMOptions?} options - options for building the URL.
  * @returns {URL | undefined} URL for the ESM, or undefined if an error occurs.
  */
-export function buildESMUrl(
-  module: string,
-  options?: ESMOptions,
-): URL | undefined {
+export function buildESMUrl(module: string, options?: ESMOptions): URL | undefined {
   try {
-    const pkg = parsePackage(module);
+    const url = createCdnPackageUrl("esm", module, options?.external === true ? "*" : "");
+    if (!options) return url;
 
-    const url = new URL(
-      `${options?.external === true ? "*" : ""}${pkg.full}`,
-      "https://esm.sh/",
-    );
-
-    if (options?.deps) {
-      url.searchParams.append("deps", options.deps.join(","));
+    const params = url.searchParams;
+    appendList(params, "deps", options.deps);
+    if (options.alias) {
+      const aliases = Object.entries(options.alias).map(([from, to]) => `${from}:${to}`);
+      appendList(params, "alias", aliases);
     }
+    appendList(params, "exports", options.treeShake);
 
-    if (options?.alias) {
-      url.searchParams.append(
-        "alias",
-        Object.entries(options.alias)
-          .map(([key, value]) => `${key}:${value}`)
-          .join(","),
-      );
+    if (options.bundle === "bundle-deps") {
+      params.append("standalone", "true");
+    } else if (options.bundle === "no-bundle") {
+      params.append("bundle", "false");
     }
+    appendFlag(params, "dev", options.dev);
 
-    if (options?.treeShake) {
-      url.searchParams.append("exports", options.treeShake.join(","));
-    }
+    const { esbuild } = options;
+    if (esbuild?.target) params.append("target", esbuild.target);
+    appendList(params, "conditions", esbuild?.conditions);
+    appendFlag(params, "keep-names", esbuild?.keepNames);
+    appendFlag(params, "ignore-annotations", esbuild?.ignoreAnnotations);
 
-    if (options?.bundle) {
-      url.searchParams.append("bundle", options.bundle);
-    }
-
-    if (options?.dev) {
-      url.searchParams.append("dev", "true");
-    }
-
-    if (options?.esbuild) {
-      if (options.esbuild.target) {
-        url.searchParams.append("target", options.esbuild.target);
-      }
-
-      if (options.esbuild.conditions) {
-        url.searchParams.append(
-          "conditions",
-          options.esbuild.conditions.join(","),
-        );
-      }
-
-      if (options.esbuild.keepNames) {
-        url.searchParams.append("keep-names", "true");
-      }
-
-      if (options.esbuild.ignoreAnnotations) {
-        url.searchParams.append("ignore-annotations", "true");
-      }
-    }
-
-    if (options?.worker) {
-      url.searchParams.append("worker", "true");
-    }
-
-    if (options?.css) {
-      url.searchParams.append("css", "true");
-    }
-
-    if (options?.wasm) {
-      url.searchParams.append("module", "true");
-    }
-
-    if (options?.external && Array.isArray(options.external)) {
-      url.searchParams.append("external", options.external.join(","));
-    }
-
-    if (options?.pin) {
-      url.searchParams.append("pin", options.pin);
-    }
-
-    if (options?.noDts) {
-      url.searchParams.append("no-dts", "true");
-    }
-
-    if (options?.raw) {
-      url.searchParams.append("raw", "true");
-    }
-
+    appendFlag(params, "worker", options.worker);
+    appendFlag(params, "css", options.css);
+    appendFlag(params, "module", options.wasm);
+    if (Array.isArray(options.external)) appendList(params, "external", options.external);
+    if (options.pin) params.append("pin", options.pin);
+    appendFlag(params, "no-dts", options.noDts);
+    appendFlag(params, "raw", options.raw);
     return url;
   } catch {
     return undefined;
@@ -337,13 +283,7 @@ export function buildESMUrl(
  * @param {URL | string} url - The URL or string representation of the URL.
  * @returns {Promise<string | null>} A promise that resolves to a string representing the ESM types, or null if not found.
  */
-export async function resolveESMTypes(
-  url: URL | string,
-): Promise<string | null> {
-  if (url instanceof URL) {
-    url = url.toString();
-  }
-
-  const headers = await fetch(url).then((res) => res.headers);
-  return headers.get("x-typescript-types");
+export async function resolveESMTypes(url: URL | string): Promise<string | null> {
+  const response = await fetch(url instanceof URL ? url.toString() : url);
+  return response.headers.get("x-typescript-types");
 }
