@@ -23,13 +23,13 @@ const react = esm("react@19", { bundle: "no-bundle" });
 const server = buildUnpkgUrl("react@19", { conditions: ["react-server"] });
 // https://unpkg.com/react@19?conditions=react-server
 
-const hooks = buildJSDelivrUrl("preact@10.26.4/hooks/+esm");
+const hooks = buildJSDelivrUrl("preact@10.26.4/hooks", { esm: true });
 // https://cdn.jsdelivr.net/npm/preact@10.26.4/hooks/+esm
 ```
 
 - [esm.sh](https://github.com/esm-dev/esm.sh#bundling-strategy) transforms packages for ES module imports. `bundle-deps` requests a standalone build, which bundles dependencies other than peer dependencies. `no-bundle` disables bundling.
 - [UNPKG](https://unpkg.com/guides/loading-files) serves published files. Use `conditions` to select package exports or `meta` to list files. `module: true` selects a module entry if the package provides one. It does not transform the file.
-- [jsDelivr](https://www.jsdelivr.com/esm) serves published files by default. Append `/+esm` to a package or subpath for browser-ready ES modules.
+- [jsDelivr](https://www.jsdelivr.com/esm) serves published files by default. Set `esm: true` to add `/+esm` for a browser-ready ES module of the package or subpath.
 
 ## Load JSR and GitHub packages from esm.sh
 

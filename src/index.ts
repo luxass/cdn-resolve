@@ -1,6 +1,7 @@
 import { CDN_BASE_URLS } from "./cdn-url";
 import type { ESMOptions } from "./esm";
 import { buildESMUrl, resolveESMTypes } from "./esm";
+import type { JSDelivrOptions } from "./jsdelivr";
 import { buildJSDelivrUrl } from "./jsdelivr";
 import type { UnpkgESMOptions, UnpkgOptions } from "./unpkg";
 import { buildUnpkgUrl } from "./unpkg";
@@ -8,7 +9,7 @@ import { buildUnpkgUrl } from "./unpkg";
 export { buildESMUrl, buildJSDelivrUrl, buildUnpkgUrl, resolveESMTypes };
 export { parsePackage } from "./parse";
 export type { ParsedPackage } from "./parse";
-export type { ESMOptions, UnpkgESMOptions, UnpkgOptions };
+export type { ESMOptions, JSDelivrOptions, UnpkgESMOptions, UnpkgOptions };
 
 /**
  * The base URLs for the supported npm CDNs.
@@ -33,13 +34,15 @@ export function normalizeCdnUrl(cdn: SupportedCDNS, module: string): string {
   return CDN_URLS[cdn] + "/" + module.replace(/^\//u, "");
 }
 
-type Options<TCDN extends Exclude<SupportedCDNS, "jsdelivr">> = TCDN extends "esm"
+type Options<TCDN extends SupportedCDNS> = TCDN extends "esm"
   ? ESMOptions
-  : UnpkgOptions;
+  : TCDN extends "unpkg"
+    ? UnpkgOptions
+    : JSDelivrOptions;
 
-export type Builder<TCDN extends SupportedCDNS> = TCDN extends "jsdelivr"
-  ? (module: string) => URL | undefined
-  : (module: string, options?: Options<Exclude<TCDN, "jsdelivr">>) => URL | undefined;
+export type Builder<TCDN extends SupportedCDNS> = TCDN extends SupportedCDNS
+  ? (module: string, options?: Options<TCDN>) => URL | undefined
+  : never;
 
 const cdnBuilders = {
   esm: buildESMUrl,
