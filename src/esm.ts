@@ -3,42 +3,223 @@ import { createCdnPackageUrl } from "./cdn-url";
 type ECMAScriptYear = 2015 | 2016 | 2017 | 2018 | 2019 | 2020 | 2021 | 2022 | 2023 | 2024;
 type ESMTarget = `es${ECMAScriptYear}` | "esnext" | "deno" | "denonext" | "node";
 
-/** Build options for esm.sh. */
 export interface ESMOptions {
-  /** Overrides dependency versions, for example `['react@18.3.1']`. */
+  /**
+   * By default, esm.sh rewrites import specifiers based on the package dependencies.
+   * To specify the version of these dependencies, you can add the
+   * `?deps=PACKAGE@VERSION` query. To specify multiple dependencies, separate them
+   * with a comma, like this: `?deps=react@17.0.2,react-dom@17.0.2`.
+   *
+   * ```ts
+   * import React from "https://esm.sh/react@17.0.2";
+   * import useSWR from "https://esm.sh/swr?deps=react@17.0.2";
+   * ```
+   */
   deps?: string[];
-  /** Replaces dependencies, for example `{ react: 'preact/compat' }`. */
+
+  /**
+   * A list of modules to alias to other modules
+   *
+   * ```ts
+   * import useSWR from "https://esm.sh/swr?alias=react:preact/compat";
+   * ```
+   * in combination with ?deps:
+   * ```ts
+   * import useSWR from "https://esm.sh/swr?alias=react:preact/compat&deps=preact@10.5.14";
+   * ```
+   */
   alias?: Record<string, string>;
-  /** Keeps only the named exports in the build. */
+
+  /**
+   * By default, esm.sh exports a module with all its exported members. However, if
+   * you want to import only a specific set of members, you can specify them by
+   * adding a `?exports=foo,bar` query to the import statement.
+   *
+   * ```ts
+   * import { __await, __rest } from "https://esm.sh/tslib"; // 7.3KB
+   * import { __await, __rest } from "https://esm.sh/tslib?exports=__await,__rest"; // 489B
+   * ```
+   */
   treeShake?: string[];
-  /** `bundle-deps` bundles dependencies except peers. `no-bundle` disables bundling. */
+
+  /**
+   * By default, esm.sh bundles sub-modules that are not declared in the `exports` field.
+   *
+   * Use `bundle-deps` to bundle all dependencies of a package, except peer
+   * dependencies, into a single JS file. The builder adds the `?standalone` query:
+   *
+   * ```ts
+   * import { Button } from "https://esm.sh/antd?standalone=true";
+   * ```
+   *
+   * Bundling deps can reduce the number of network requests and improve performance.
+   * However, it may bundle shared code repeatedly. In extreme cases, it may break the
+   * side effects of the package, or change the `import.meta.url` pointing. To avoid
+   * this, use `no-bundle` to disable the default bundling behavior. The builder adds
+   * the `?bundle=false` query:
+   *
+   * ```ts
+   * import "https://esm.sh/@pyscript/core?bundle=false";
+   * ```
+   */
   bundle?: "bundle-deps" | "no-bundle";
-  /** Selects the development build. */
+
+  /**
+   * With the `?dev` option, esm.sh builds a module with `process.env.NODE_ENV` set
+   * to `"development"` or based on the condition `development` in the `exports`
+   * field. This is useful for libraries that have different behavior in development
+   * and production. For example, React will use a different warning message in
+   * development mode.
+   *
+   * ```ts
+   * import React from "https://esm.sh/react?dev";
+   * ```
+   */
   dev?: boolean;
-  /** Overrides options that esm.sh passes to its builder. */
+
+  /**
+   * By default, esm.sh checks the `User-Agent` header to determine the build target.
+   */
   esbuild?: {
-    /** Selects the output target instead of using the request's user agent. */
+    /**
+     * The target environment for the generated code. esm.sh supports every
+     * ECMAScript year from `es2015` to `es2024`, plus `esnext`, `deno`,
+     * `denonext`, and `node`.
+     *
+     * ```ts
+     * import React from "https://esm.sh/react?target=es2020";
+     * ```
+     */
     target?: ESMTarget;
-    /** Adds custom conditions for resolving package exports. */
+
+    /**
+     * Use custom conditions for the build
+     * @see https://esbuild.github.io/api/#conditions
+     *
+     * ```ts
+     * import foo from "https://esm.sh/foo?conditions=custom1,custom2";
+     * ```
+     */
     conditions?: string[];
-    /** Preserves function and class names when minifying. */
+
+    /**
+     * Keep names when minifying
+     * @see https://esbuild.github.io/api/#keep-names
+     *
+     * ```ts
+     * import foo from "https://esm.sh/foo?keep-names";
+     * ```
+     */
     keepNames?: boolean;
-    /** Ignores purity annotations when optimizing the build. */
+
+    /**
+     * Ignore annotations when building
+     * @see https://esbuild.github.io/api/#ignore-annotations
+     *
+     * ```ts
+     * import foo from "https://esm.sh/foo?ignore-annotations";
+     * ```
+     */
     ignoreAnnotations?: boolean;
   };
-  /** Returns a factory for a web worker. */
+
+  /**
+   * esm.sh supports `?worker` query to load the module as a web worker:
+   *
+   * ```js
+   * import workerFactory from "https://esm.sh/monaco-editor/esm/vs/editor/editor.worker?worker";
+   *
+   * const worker = workerFactory();
+   * ```
+   *
+   * You can pass some custom code snippet to the worker when calling the factory
+   * function:
+   *
+   * ```js
+   * const workerAddon = `
+   * self.onmessage = function (e) {
+   *   console.log(e.data)
+   * }
+   * `;
+   * const worker = workerFactory(workerAddon);
+   * ```
+   */
   worker?: boolean;
-  /** Returns the CSS imported by the package's JavaScript. */
+
+  /**
+   * ```html
+   * <link rel="stylesheet" href="https://esm.sh/monaco-editor?css">
+   * ```
+   *
+   * This only works when the package **imports CSS files in JS** directly.
+   */
   css?: boolean;
-  /** Wraps a `.wasm` file in a JavaScript module. */
+
+  /**
+   * esm.sh supports importing wasm modules in JS directly, to do that, you need to
+   * add `?module` query to the import URL:
+   *
+   * ```ts
+   * import wasm from "https://esm.sh/@dqbd/tiktoken@1.0.3/tiktoken_bg.wasm?module";
+   *
+   * const { exports } = new WebAssembly.Instance(wasm, imports);
+   * ```
+   */
   wasm?: boolean;
-  /** Leaves the named dependencies as bare imports, or all dependencies if `true`. */
+
+  /**
+   * A list of dependencies to externalize from the bundle
+   *
+   * ```ts
+   * import useSWR from "https://esm.sh/swr?external=react";
+   * ```
+   *
+   * Alternatively, you can mark all dependencies as external by adding a `*`
+   * before the package name
+   * ```ts
+   * import useSWR from "https://esm.sh/*swr";
+   * ```
+   */
   external?: string[] | boolean;
-  /** Sends a legacy esm.sh build version. This does not guarantee an immutable build. */
+
+  /**
+   * Requests a legacy esm.sh build version with the `?pin` query.
+   *
+   * ```ts
+   * import React from "https://esm.sh/react-dom?pin=v135";
+   * ```
+   *
+   * esm.sh only serves `?pin` for older build versions, and it does not guarantee
+   * an immutable build. To keep a module stable, pin an exact package version,
+   * such as `react-dom@18.3.1`, instead.
+   */
   pin?: string;
-  /** Omits the `X-TypeScript-Types` header. */
+
+  /**
+   * Removes the `X-TypeScript-Types` header from the response with the
+   * `?no-dts` query. esm.sh still builds the module.
+   */
   noDts?: boolean;
-  /** Returns the published file without transforming it into an ES module. */
+
+  /**
+   * In rare cases, you may want to request JS source files from packages, as-is,
+   * without transformation into ES modules. To do so, you need to add a `?raw`
+   * query to the request URL.
+   *
+   * For example, you might need to register a package's source script as a service worker
+   * in a browser that [does not yet support](https://caniuse.com/mdn-api_serviceworker_ecmascript_modules)
+   * the `type: "module"` option:
+   *
+   * ```js
+   * await navigator.serviceWorker.register(
+   *   new URL(
+   *     "https://esm.sh/playground-elements/playground-service-worker.js?raw",
+   *     import.meta.url.href
+   *   ),
+   *   { scope: '/' }
+   * );
+   * ```
+   */
   raw?: boolean;
 }
 
@@ -50,7 +231,13 @@ function appendList(params: URLSearchParams, key: string, values?: string[]): vo
   if (values) params.append(key, values.join(","));
 }
 
-/** Builds an esm.sh URL, or returns undefined if it cannot build one. */
+/**
+ * Builds the URL for esm.sh
+ *
+ * @param {string} module - The module name.
+ * @param {ESMOptions?} options - options for building the URL.
+ * @returns {URL | undefined} URL for the ESM, or undefined if an error occurs.
+ */
 export function buildESMUrl(module: string, options?: ESMOptions): URL | undefined {
   try {
     const url = createCdnPackageUrl("esm", module, options?.external === true ? "*" : "");
@@ -90,7 +277,12 @@ export function buildESMUrl(module: string, options?: ESMOptions): URL | undefin
   }
 }
 
-/** Reads esm.sh's type declaration URL, or returns null if the header is absent. */
+/**
+ * Resolves the ESM types for a given URL.
+ *
+ * @param {URL | string} url - The URL or string representation of the URL.
+ * @returns {Promise<string | null>} A promise that resolves to a string representing the ESM types, or null if not found.
+ */
 export async function resolveESMTypes(url: URL | string): Promise<string | null> {
   const response = await fetch(url instanceof URL ? url.toString() : url);
   return response.headers.get("x-typescript-types");

@@ -6,7 +6,15 @@ export const CDN_BASE_URLS = {
   jsdelivr: "https://cdn.jsdelivr.net/npm",
 } as const;
 
-/** Builds a provider URL from a package specifier with an explicit version. */
+/**
+ * Builds a CDN URL from a package specifier.
+ *
+ * The specifier always gets an explicit version, so `react` becomes
+ * `react@latest`. The optional prefix goes before the package name, for
+ * example `*` for esm.sh's external dependencies.
+ *
+ * @throws Error if the package name is invalid.
+ */
 export function createCdnPackageUrl(
   cdn: keyof typeof CDN_BASE_URLS,
   specifier: string,
