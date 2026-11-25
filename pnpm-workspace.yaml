@@ -15,7 +15,7 @@ catalogs:
     typescript: 7.0.2
 
   test:
-    vitest: 5.1.0
+    vitest: 5.1.1
 
   types:
     "@types/node": 24.19.2
